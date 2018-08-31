@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Николай Баранов](https://up.htmlacademy.ru/javascript/15/user/477149).
-* Наставник: `Неизвестно`.
+* Наставник: [Алексей Хапов](https://up.htmlacademy.ru/javascript/15/user/118459).
 
 ---
 
