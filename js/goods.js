@@ -156,7 +156,7 @@ var makeGoodsArray = function (count) {
 };
 
 (function makeDomElements() {
-  var goodElement = cardTemplate.cloneNode(true);
+  // var goodElement = cardTemplate.cloneNode(true);
 
 
   makeGoodsArray(GOODS_COUNT);
