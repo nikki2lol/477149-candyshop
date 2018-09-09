@@ -146,6 +146,7 @@ var generateItemsArray = function (count) {
   for (var i = 0; i < count; i++) {
     array[i] = makeRandomGoods();
   }
+  console.log(array);
   return array;
 };
 
@@ -177,7 +178,7 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.star__count').innerHTML = '(' + item.rating.number + ')';
 
-  if (Math.random() > 0.5) {
+  if (item.nutritionFacts.sugar > 0.5) {
     goodsElement.querySelector('.card__characteristic').innerHTML = 'Содержит сахар. ' + item.nutritionFacts.energy + ' ккал.';
   } else {
     goodsElement.querySelector('.card__characteristic').innerHTML = 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
