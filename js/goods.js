@@ -134,7 +134,7 @@ var makeRandomGoods = function () {
       number: getRandomNumber(MIN_QUANTITY_RATING, MAX_QUANTITY_RATING),
     },
     nutritionFacts: {
-      sugar: Math.random(),
+      sugar: Math.random() > 0.5,
       energy: getRandomNumber(MIN_ENERGY, MAX_ENERGY),
       contents: getRandomArray(CONTENTS),
     }
@@ -146,7 +146,6 @@ var generateItemsArray = function (count) {
   for (var i = 0; i < count; i++) {
     array[i] = makeRandomGoods();
   }
-  console.log(array);
   return array;
 };
 
@@ -163,28 +162,32 @@ var generateItem = function (item) {
   }
   goodsElement.classList.add(amountClass);
 
-  goodsElement.querySelector('.card__title').innerHTML = item.name;
+  goodsElement.querySelector('.card__title').textContent = item.name;
 
   goodsElement.querySelector('.card__img').setAttribute('src', item.picture);
 
-  goodsElement.querySelector('.card__price').innerHTML = item.price + ' <span class="card__currency">₽</span><span class="card__weight">/' + item.weight + ' Г</span>';
+  goodsElement.querySelector('.card__price').insertAdjacentHTML('afterbegin', item.price);
 
-  goodsElement.querySelector('.stars__rating').innerHTML = item.rating.value;
+  goodsElement.querySelector('.card__weight').insertAdjacentHTML('afterbegin', '/ ' + item.weight + ' Г');
+
+  goodsElement.querySelector('.stars__rating').textContent = item.rating.value;
 
   var goodsRating = goodsElement.querySelector('.stars__rating');
   goodsRating.classList.remove('stars__rating--five');
 
   goodsRating.classList.add(STARS_RATING[item.rating.value - 1]);
 
-  goodsElement.querySelector('.star__count').innerHTML = '(' + item.rating.number + ')';
+  goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
 
-  if (item.nutritionFacts.sugar > 0.5) {
-    goodsElement.querySelector('.card__characteristic').innerHTML = 'Содержит сахар. ' + item.nutritionFacts.energy + ' ккал.';
+  var sugarComment;
+  if (item.nutritionFacts.sugar) {
+    sugarComment = 'Содержит сахар. ' + item.nutritionFacts.energy + ' ккал.';
   } else {
-    goodsElement.querySelector('.card__characteristic').innerHTML = 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
+    sugarComment = 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
   }
+  goodsElement.querySelector('.card__characteristic').textContent = sugarComment;
 
-  goodsElement.querySelector('.card__composition-list').innerHTML = item.nutritionFacts.contents;
+  goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
   catalogCards.appendChild(goodsElement);
 };
@@ -199,11 +202,11 @@ var createBasketArray = function (array) {
   for (var j = 0; j < array.length; j++) {
     var goodsElement = basketTemplate.cloneNode(true);
 
-    goodsElement.querySelector('.card-order__title').innerHTML = array[j].name;
+    goodsElement.querySelector('.card-order__title').textContent = array[j].name;
 
-    goodsElement.querySelector('.card-order__img').setAttribute('src', array[j].picture);
+    goodsElement.querySelector('.card-order__img').src = array[j].picture;
 
-    goodsElement.querySelector('.card-order__price').innerHTML = array[j].price + ' ₽';
+    goodsElement.querySelector('.card-order__price').textContent = array[j].price + ' ₽';
 
     basketCards.appendChild(goodsElement);
   }
