@@ -123,6 +123,9 @@ var getRandomArray = function (array) {
 
 // Функция для создания случайного товара
 var makeRandomGoods = function () {
+  // var namesArray = NAMES.slice(0);
+  // var picturesArray = PICTURES.slice(0);
+
   return {
     name: getRandomArrayElement(NAMES),
     picture: getRandomArrayElement(PICTURES),
@@ -134,6 +137,7 @@ var makeRandomGoods = function () {
       number: getRandomNumber(MIN_QUANTITY_RATING, MAX_QUANTITY_RATING),
     },
     nutritionFacts: {
+      sugar: Math.random() > 0.5,
       energy: getRandomNumber(MIN_ENERGY, MAX_ENERGY),
       contents: getRandomArray(CONTENTS),
     }
@@ -144,6 +148,7 @@ var generateItemsArray = function (count) {
   var array = [];
   for (var i = 0; i < count; i++) {
     array[i] = makeRandomGoods();
+
   }
   return array;
 };
@@ -163,7 +168,7 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.card__title').textContent = item.name;
 
-  goodsElement.querySelector('.card__img').setAttribute('src', item.picture);
+  goodsElement.querySelector('.card__img').src = item.picture;
 
   goodsElement.querySelector('.card__price-container').textContent = item.price;
 
@@ -179,9 +184,9 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
 
-  var sugarCheck = Math.random() > 0.5 ? 'С сахаром. ' : 'Без сахара. ';
+  var sugarCheck = item.nutritionFacts.sugar ? 'С сахаром. ' + item.nutritionFacts.energy + ' ккал.' : 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
 
-  goodsElement.querySelector('.card__characteristic').textContent = sugarCheck + item.nutritionFacts.energy + ' ккал.' + item.nutritionFacts.energy + ' ккал.';
+  goodsElement.querySelector('.card__characteristic').textContent = sugarCheck;
 
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
