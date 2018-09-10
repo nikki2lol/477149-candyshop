@@ -134,7 +134,6 @@ var makeRandomGoods = function () {
       number: getRandomNumber(MIN_QUANTITY_RATING, MAX_QUANTITY_RATING),
     },
     nutritionFacts: {
-      sugar: Math.random() > 0.5,
       energy: getRandomNumber(MIN_ENERGY, MAX_ENERGY),
       contents: getRandomArray(CONTENTS),
     }
@@ -166,26 +165,23 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.card__img').setAttribute('src', item.picture);
 
-  goodsElement.querySelector('.card__price').insertAdjacentHTML('afterbegin', item.price);
+  goodsElement.querySelector('.card__price-container').textContent = item.price;
 
-  goodsElement.querySelector('.card__weight').insertAdjacentHTML('afterbegin', '/ ' + item.weight + ' Г');
+  goodsElement.querySelector('.card__weight').textContent = '/ ' + item.weight + ' Г';
 
   goodsElement.querySelector('.stars__rating').textContent = item.rating.value;
 
   var goodsRating = goodsElement.querySelector('.stars__rating');
+
   goodsRating.classList.remove('stars__rating--five');
 
   goodsRating.classList.add(STARS_RATING[item.rating.value - 1]);
 
   goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
 
-  var sugarComment;
-  if (item.nutritionFacts.sugar) {
-    sugarComment = 'Содержит сахар. ' + item.nutritionFacts.energy + ' ккал.';
-  } else {
-    sugarComment = 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
-  }
-  goodsElement.querySelector('.card__characteristic').textContent = sugarComment;
+  var sugarCheck = Math.random() > 0.5 ? 'С сахаром. ' : 'Без сахара. ';
+
+  goodsElement.querySelector('.card__characteristic').textContent = sugarCheck + item.nutritionFacts.energy + ' ккал.' + item.nutritionFacts.energy + ' ккал.';
 
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
