@@ -196,7 +196,6 @@ var createGoodsArray = function (array) {
   return array;
 };
 
-//
 var createBasketArray = function (array) {
   for (var j = 0; j < BASKET_COUNT; j++) {
     var goodsElement = basketTemplate.cloneNode(true);
