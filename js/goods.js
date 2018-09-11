@@ -107,11 +107,6 @@ var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// // Получениe случайного значения из массива
-// var getRandomArrayElement = function (array) {
-//   return array[Math.floor(Math.random() * array.length)];
-// };
-
 // А эта функция для переработки массива в новый с рандомным количеством значений, взятых из первого массива
 var getRandomArray = function (array) {
   var newLength = Math.floor(Math.random() * array.length);
@@ -199,13 +194,13 @@ var createGoodsArray = function (array) {
   for (var j = 0; j < array.length; j++) {
     generateItem(array[j]);
   }
-  createBasketArray(array, BASKET_COUNT);
+  createBasketArray(array);
   return array;
 };
 
 //
-var createBasketArray = function (array, count) {
-  for (var j = 0; j < count; j++) {
+var createBasketArray = function (array) {
+  for (var j = 0; j < BASKET_COUNT; j++) {
     var goodsElement = basketTemplate.cloneNode(true);
 
     goodsElement.querySelector('.card-order__title').textContent = array[j].name;
