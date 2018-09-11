@@ -98,16 +98,19 @@ var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
+var picturesArray = PICTURES.slice();
+var namesArray = NAMES.slice();
+
 
 // Функция для нахождения случайного числа(включая min и max)
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Получениe случайного значения из массива
-var getRandomArrayElement = function (array) {
-  return array[Math.floor(Math.random() * array.length)];
-};
+// // Получениe случайного значения из массива
+// var getRandomArrayElement = function (array) {
+//   return array[Math.floor(Math.random() * array.length)];
+// };
 
 // А эта функция для переработки массива в новый с рандомным количеством значений, взятых из первого массива
 var getRandomArray = function (array) {
@@ -123,12 +126,9 @@ var getRandomArray = function (array) {
 
 // Функция для создания случайного товара
 var makeRandomGoods = function () {
-  // var namesArray = NAMES.slice(0);
-  // var picturesArray = PICTURES.slice(0);
-
   return {
-    name: getRandomArrayElement(NAMES),
-    picture: getRandomArrayElement(PICTURES),
+    name: namesArray.splice(getRandomNumber(0, namesArray.length - 1), 1),
+    picture: picturesArray.splice(getRandomNumber(0, picturesArray.length - 1), 1),
     amount: getRandomNumber(MIN_AMOUNT, MAX_AMOUNT),
     price: getRandomNumber(MIN_PRICE, MAX_PRICE),
     weight: getRandomNumber(MIN_WEIGHT, MAX_WEIGHT),
@@ -146,10 +146,12 @@ var makeRandomGoods = function () {
 
 var generateItemsArray = function (count) {
   var array = [];
+
   for (var i = 0; i < count; i++) {
     array[i] = makeRandomGoods();
 
   }
+
   return array;
 };
 
@@ -197,10 +199,13 @@ var createGoodsArray = function (array) {
   for (var j = 0; j < array.length; j++) {
     generateItem(array[j]);
   }
+  createBasketArray(array, BASKET_COUNT);
+  return array;
 };
 
-var createBasketArray = function (array) {
-  for (var j = 0; j < array.length; j++) {
+//
+var createBasketArray = function (array, count) {
+  for (var j = 0; j < count; j++) {
     var goodsElement = basketTemplate.cloneNode(true);
 
     goodsElement.querySelector('.card-order__title').textContent = array[j].name;
@@ -219,4 +224,3 @@ cardTemplate.classList.remove('card--in-stock');
 basketCards.classList.remove('goods__cards--empty');
 basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
 createGoodsArray(generateItemsArray(CATALOG_COUNT));
-createBasketArray(generateItemsArray(BASKET_COUNT));
