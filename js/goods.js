@@ -181,9 +181,7 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
 
-  var sugarCheck = item.nutritionFacts.sugar ? 'С сахаром. ' + item.nutritionFacts.energy + ' ккал.' : 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
-
-  goodsElement.querySelector('.card__characteristic').textContent = sugarCheck;
+  goodsElement.querySelector('.card__characteristic').textContent = item.nutritionFacts.sugar ? 'С сахаром. ' + item.nutritionFacts.energy + ' ккал.' : 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
 
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
