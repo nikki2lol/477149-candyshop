@@ -94,7 +94,7 @@ var CONTENTS = [
 var STARS_RATING = ['stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five'];
 var BASKET_COUNT = 3;
 var CATALOG_COUNT = 26;
-var catalogCards = document.querySelector('.catalog__cards');
+// var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
@@ -185,7 +185,7 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
-  catalogCards.appendChild(goodsElement);
+  // catalogCards.appendChild(goodsElement);
 };
 
 var createGoodsArray = function (array) {
@@ -210,9 +210,9 @@ var createBasketArray = function (array) {
   }
 };
 
-catalogCards.classList.remove('catalog__cards--load');
-catalogCards.querySelector('.catalog__load').classList.add('visually-hidden');
-cardTemplate.classList.remove('card--in-stock');
-basketCards.classList.remove('goods__cards--empty');
-basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
+// catalogCards.classList.remove('catalog__cards--load');
+// catalogCards.querySelector('.catalog__load').classList.add('visually-hidden');
+// cardTemplate.classList.remove('card--in-stock');
+// basketCards.classList.remove('goods__cards--empty');
+// basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
 createGoodsArray(generateItemsArray(CATALOG_COUNT));
