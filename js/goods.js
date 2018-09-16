@@ -96,7 +96,7 @@ var BASKET_COUNT = 3;
 var CATALOG_COUNT = 26;
 // var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
-var basketCards = document.querySelector('.goods__cards');
+// var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 var picturesArray = PICTURES.slice();
 var namesArray = NAMES.slice();
@@ -206,7 +206,7 @@ var createBasketArray = function (array) {
 
     goodsElement.querySelector('.card-order__price').textContent = array[j].price + ' ₽';
 
-    basketCards.appendChild(goodsElement);
+    // basketCards.appendChild(goodsElement);
   }
 };
 
