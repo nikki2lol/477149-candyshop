@@ -97,9 +97,9 @@ var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
+var basketHeader = document.querySelector('.main-header__basket');
 var picturesArray = PICTURES.slice();
 var namesArray = NAMES.slice();
-// var headerBasket = document.querySelector('.main-header__basket');
 
 // Функция для нахождения случайного числа(включая min и max)
 var getRandomNumber = function (min, max) {
@@ -119,7 +119,7 @@ var getRandomArray = function (array) {
 };
 
 // Функция для создания случайного товара
-var makeRandomGoods = function () {
+var makeRandomGoods = function (i) {
   return {
     name: namesArray.splice(getRandomNumber(0, namesArray.length - 1), 1),
     picture: picturesArray.splice(getRandomNumber(0, picturesArray.length - 1), 1),
@@ -134,33 +134,26 @@ var makeRandomGoods = function () {
       sugar: Math.random() > 0.5,
       energy: getRandomNumber(MIN_ENERGY, MAX_ENERGY),
       contents: getRandomArray(CONTENTS),
-    }
+    },
+    index: i
   };
 };
 
 var generateItemsArray = function (count) {
-  var cardArray = [];
-  var basketArray = [];
-  var basketObj;
+  var array = [];
 
   for (var i = 0; i < count; i++) {
-    cardArray[i] = makeRandomGoods();
-    basketObj = Object.assign({}, cardArray[i]);
-    basketObj.orderedAmount = 1;
-    delete basketObj.amount;
-    delete basketObj.rating;
-    delete basketObj.nutritionFacts;
-    delete basketObj.weight;
-    basketArray[i] = basketObj;
+    array[i] = makeRandomGoods(i);
   }
 
-  return {
-    cardArray: cardArray,
-    basketArray: basketArray
-  };
+  return array;
 };
 
+var objArray = generateItemsArray(CATALOG_COUNT);
+
 var generateItem = function (item) {
+  cardTemplate.classList.remove('card--in-stock');
+
   var goodsElement = cardTemplate.cloneNode(true);
 
   var amountClass;
@@ -195,29 +188,53 @@ var generateItem = function (item) {
 
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
+  goodsElement.dataset.index = item.index;
+
   catalogCards.appendChild(goodsElement);
 };
 
-var createBasketGoods = function (index) {
-  // for (var j = 0; j < 3; j++) {
-  var renderedGoodsArray = [].slice.call(document.querySelectorAll('.catalog__card'));
+var copyObj = function (index) {
+  var basketObj;
+  basketObj = Object.assign({}, objArray[index]);
+  basketObj.orderedAmount = 1;
+  delete basketObj.rating;
+  delete basketObj.nutritionFacts;
+  delete basketObj.weight;
+
+  return basketObj;
+};
+
+var createBasketGoods = function (obj) {
+  basketCards.classList.remove('goods__cards--empty');
+
+  basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
+
   var goodsElement = basketTemplate.cloneNode(true);
 
-  goodsElement.querySelector('.card-order__title').textContent = renderedGoodsArray[index].querySelector('.card__title').textContent;
+  goodsElement.dataset.index = obj.index;
 
-  goodsElement.querySelector('.card-order__img').src = renderedGoodsArray[index].querySelector('.card__img').getAttribute('src');
+  goodsElement.querySelector('.card-order__title').textContent = obj.name;
 
-  goodsElement.querySelector('.card-order__price').textContent = renderedGoodsArray[index].querySelector('.card__price-container').textContent + ' ₽';
+  goodsElement.querySelector('.card-order__img').src = obj.picture;
 
-  goodsElement.querySelector('.card-order__count').textContent = 1;
+  goodsElement.querySelector('.card-order__price').textContent = obj.price + ' ₽';
+
+  goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
 
   basketCards.appendChild(goodsElement);
-  // }
 };
 
-var addToCard = function () {
-
-};
+// var increaseValue = function (el) {
+//   el.querySelector('.card-order__count').value = el.querySelector('.card-order__count').value + 1;
+// };
+//
+// var decreaseValue = function (el) {
+//   if (el.querySelector('.card-order__count').value === 0) {
+//     return;
+//   } else {
+//     el.querySelector('.card-order__count').value = el.querySelector('.card-order__count').value - 1;
+//   }
+// };
 
 var onFavouriteButtonsClick = function () {
   var favouriteButtons = [].slice.call(document.querySelectorAll('.card__btn-favorite'));
@@ -229,18 +246,52 @@ var onFavouriteButtonsClick = function () {
   });
 };
 
-var onAddButtonClick = function () {
+var checkDuplicateArray = function (array, item) {
+  array.forEach(function (elem) {
+    if (elem.name === item) {
+      console.log(elem.name);
+      console.log(item);
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
+
+var checkCards = function () {
   var renderedGoodsArray = [].slice.call(document.querySelectorAll('.catalog__card'));
   var addButtons = [].slice.call(document.querySelectorAll('.card__btn'));
+  var clickedCard;
+  var index;
+  var currentCopiedObject;
+  var basketArray;
+
   addButtons.forEach(function (element) {
     element.addEventListener('click', function (evt) {
       evt.preventDefault();
-      var index = renderedGoodsArray.indexOf(evt.target.closest('.catalog__card'));
-      addToCard();
-      createBasketGoods(index);
+      clickedCard = evt.target.closest('.catalog__card');
+      index = renderedGoodsArray.indexOf(clickedCard);
+      currentCopiedObject = copyObj(index);
+      console.log(currentCopiedObject.orderedAmount);
+      console.log(currentCopiedObject.amount);
+      basketArray = [].slice.call(document.querySelectorAll('.goods .goods_card'));
+      var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]');
+
+      if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value < currentCopiedObject.amount) {
+        duplicateBasketCard.querySelector('.card-order__count').value = +duplicateBasketCard.querySelector('.card-order__count').value + 1;
+      } else if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value >= currentCopiedObject.amount) {
+        return;
+      } else {
+        createBasketGoods(currentCopiedObject);
+      }
+
+
+      if (renderedGoodsArray[index].classList.contains('card--soon')) {
+        return;
+      }
+
     });
   });
-  // basketCount > 0 ? headerBasket.textContent = basketCount : headerBasket.textContent = 'В корзине ничего нет';
 };
 
 var createGoodsArray = function (array) {
@@ -249,14 +300,11 @@ var createGoodsArray = function (array) {
   }
 
   onFavouriteButtonsClick();
-  onAddButtonClick();
+  checkCards();
 
   return array;
 };
 
 catalogCards.classList.remove('catalog__cards--load');
 catalogCards.querySelector('.catalog__load').classList.add('visually-hidden');
-// cardTemplate.classList.remove('card--in-stock');
-// basketCards.classList.remove('goods__cards--empty');
-// basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
-createGoodsArray(generateItemsArray(CATALOG_COUNT).cardArray);
+createGoodsArray(objArray);
