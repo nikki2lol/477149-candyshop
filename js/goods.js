@@ -97,7 +97,7 @@ var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
-var basketHeader = document.querySelector('.main-header__basket');
+// var basketHeader = document.querySelector('.main-header__basket');
 var picturesArray = PICTURES.slice();
 var namesArray = NAMES.slice();
 
@@ -246,25 +246,12 @@ var onFavouriteButtonsClick = function () {
   });
 };
 
-var checkDuplicateArray = function (array, item) {
-  array.forEach(function (elem) {
-    if (elem.name === item) {
-      console.log(elem.name);
-      console.log(item);
-      return true;
-    } else {
-      return false;
-    }
-  });
-};
-
 var checkCards = function () {
   var renderedGoodsArray = [].slice.call(document.querySelectorAll('.catalog__card'));
   var addButtons = [].slice.call(document.querySelectorAll('.card__btn'));
   var clickedCard;
   var index;
   var currentCopiedObject;
-  var basketArray;
 
   addButtons.forEach(function (element) {
     element.addEventListener('click', function (evt) {
@@ -272,9 +259,6 @@ var checkCards = function () {
       clickedCard = evt.target.closest('.catalog__card');
       index = renderedGoodsArray.indexOf(clickedCard);
       currentCopiedObject = copyObj(index);
-      console.log(currentCopiedObject.orderedAmount);
-      console.log(currentCopiedObject.amount);
-      basketArray = [].slice.call(document.querySelectorAll('.goods .goods_card'));
       var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]');
 
       if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value < currentCopiedObject.amount) {
