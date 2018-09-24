@@ -97,7 +97,7 @@ var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
-// var basketHeader = document.querySelector('.main-header__basket');
+var basketHeader = document.querySelector('.main-header__basket');
 var picturesArray = PICTURES.slice();
 var namesArray = NAMES.slice();
 
@@ -205,9 +205,6 @@ var copyObj = function (index) {
 };
 
 var createBasketGoods = function (obj) {
-  basketCards.classList.remove('goods__cards--empty');
-
-  basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
 
   var goodsElement = basketTemplate.cloneNode(true);
 
@@ -217,11 +214,82 @@ var createBasketGoods = function (obj) {
 
   goodsElement.querySelector('.card-order__img').src = obj.picture;
 
-  goodsElement.querySelector('.card-order__price').textContent = obj.price + ' ₽';
+  goodsElement.querySelector('.card-order__price-value').textContent = obj.price;
+
+  goodsElement.dataset.price = obj.price;
 
   goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
 
+  goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
+    evt.preventDefault();
+    obj.amount = obj.amount + goodsElement.querySelector('.card-order__count').value;
+    goodsElement.querySelector('.card-order__count').value = 0;
+    goodsElement.parentNode.removeChild(goodsElement);
+    checkBasketArray();
+  });
+
+  goodsElement.querySelector('.card-order__btn--decrease').addEventListener('click', function (evt) {
+    evt.preventDefault();
+    var value = +goodsElement.querySelector('.card-order__count').value;
+    if (value <= 1) {
+      return;
+    } else {
+      value = value - 1;
+      goodsElement.querySelector('.card-order__count').value = value;
+      refreshPrice(goodsElement);
+    }
+
+  });
+
+  goodsElement.querySelector('.card-order__btn--increase').addEventListener('click', function (evt) {
+    evt.preventDefault();
+    var value = +goodsElement.querySelector('.card-order__count').value;
+    if (value >= obj.amount) {
+      return;
+    } else {
+      value = value + 1;
+      goodsElement.querySelector('.card-order__count').value = value;
+      refreshPrice(goodsElement);
+    }
+  });
+
   basketCards.appendChild(goodsElement);
+};
+
+var checkBasketArray = function () {
+  var basketArray = [].slice.call(document.querySelectorAll('.goods_card.card-order'));
+  var basketValue = [];
+  var basketPrice = [];
+
+  if (basketArray.length === 0) {
+    basketCards.classList.add('goods__cards--empty');
+    basketCards.querySelector('.goods__card-empty').classList.remove('visually-hidden');
+    basketHeader.textContent = 'В корзине ничего нет';
+  } else {
+    basketArray.forEach(function (element) {
+      basketValue.push(+element.querySelector('.card-order__count').value);
+    });
+
+    var basketTotalValue = basketValue.reduce(function (a, b) {
+      return a + b;
+    });
+
+    basketArray.forEach(function (element) {
+      basketPrice.push(+element.querySelector('.card-order__price-value').textContent);
+    });
+
+    var basketTotalPrice = basketPrice.reduce(function (a, b) {
+      return a + b;
+    });
+
+    basketCards.classList.remove('goods__cards--empty');
+    basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
+    basketHeader.textContent = 'В Вашей корзине ' + basketTotalValue + ' товаров на сумму ' + basketTotalPrice + ' Р';
+  }
+};
+
+var refreshPrice = function (e) {
+  e.querySelector('.card-order__price-value').textContent = +e.getAttribute('data-price') * +e.querySelector('.card-order__count').value;
 };
 
 // var increaseValue = function (el) {
@@ -261,6 +329,10 @@ var checkCards = function () {
       currentCopiedObject = copyObj(index);
       var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]');
 
+      if (renderedGoodsArray[index].classList.contains('card--soon')) {
+        return;
+      }
+
       if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value < currentCopiedObject.amount) {
         duplicateBasketCard.querySelector('.card-order__count').value = +duplicateBasketCard.querySelector('.card-order__count').value + 1;
       } else if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value >= currentCopiedObject.amount) {
@@ -269,11 +341,8 @@ var checkCards = function () {
         createBasketGoods(currentCopiedObject);
       }
 
-
-      if (renderedGoodsArray[index].classList.contains('card--soon')) {
-        return;
-      }
-
+      refreshPrice(document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]'));
+      checkBasketArray();
     });
   });
 };
