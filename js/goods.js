@@ -149,9 +149,21 @@ var generateItemsArray = function (count) {
   return array;
 };
 
+// исходный массив с объектами карточек
 var objArray = generateItemsArray(CATALOG_COUNT);
 
-var generateItem = function (item) {
+// скопированный и видоизмененный массив для корзины
+var basketObjArray = objArray.map(function (element, index) {
+  var basketObj = Object.assign({}, objArray[index]);
+  basketObj.orderedAmount = 1;
+  delete basketObj.rating;
+  delete basketObj.nutritionFacts;
+  delete basketObj.weight;
+  return basketObj;
+});
+
+// функция для генерации дом-элементов карточек товара (каталог)
+var renderGoodsCard = function (item) {
   cardTemplate.classList.remove('card--in-stock');
 
   var goodsElement = cardTemplate.cloneNode(true);
@@ -190,20 +202,20 @@ var generateItem = function (item) {
 
   goodsElement.dataset.index = item.index;
 
+  goodsElement.querySelector('.card__btn').addEventListener('click', function (evt) {
+    onAddButtonClick(evt);
+    // refreshData(goodsElement);
+  });
+
+  goodsElement.querySelector('.card__btn-favorite').addEventListener('click', function (evt) {
+    evt.preventDefault();
+    goodsElement.querySelector('.card__btn-favorite').classList.toggle('card__btn-favorite--selected');
+  });
+
   catalogCards.appendChild(goodsElement);
 };
 
-var copyObj = function (index) {
-  var basketObj;
-  basketObj = Object.assign({}, objArray[index]);
-  basketObj.orderedAmount = 1;
-  delete basketObj.rating;
-  delete basketObj.nutritionFacts;
-  delete basketObj.weight;
-
-  return basketObj;
-};
-
+// функция для генерации дом-элементов карточек товара (корзина)
 var createBasketGoods = function (obj) {
 
   var goodsElement = basketTemplate.cloneNode(true);
@@ -222,23 +234,24 @@ var createBasketGoods = function (obj) {
 
   goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
     evt.preventDefault();
-    obj.amount = obj.amount + goodsElement.querySelector('.card-order__count').value;
+    objArray[obj.index].amount = basketObjArray[obj.index].amount;
+    basketObjArray[obj.index].orderedAmount = 0;
     goodsElement.querySelector('.card-order__count').value = 0;
     goodsElement.parentNode.removeChild(goodsElement);
     checkBasketArray();
+    refreshData(goodsElement);
   });
 
   goodsElement.querySelector('.card-order__btn--decrease').addEventListener('click', function (evt) {
     evt.preventDefault();
     var value = +goodsElement.querySelector('.card-order__count').value;
-    if (value <= 1) {
+    if (value < 1) {
       return;
     } else {
       value = value - 1;
       goodsElement.querySelector('.card-order__count').value = value;
-      refreshPrice(goodsElement);
+      refreshData(goodsElement);
     }
-
   });
 
   goodsElement.querySelector('.card-order__btn--increase').addEventListener('click', function (evt) {
@@ -249,13 +262,14 @@ var createBasketGoods = function (obj) {
     } else {
       value = value + 1;
       goodsElement.querySelector('.card-order__count').value = value;
-      refreshPrice(goodsElement);
+      refreshData(goodsElement);
     }
   });
 
   basketCards.appendChild(goodsElement);
 };
 
+// Функция для пересчета товаров, суммы и шапки корзины
 var checkBasketArray = function () {
   var basketArray = [].slice.call(document.querySelectorAll('.goods_card.card-order'));
   var basketValue = [];
@@ -288,72 +302,55 @@ var checkBasketArray = function () {
   }
 };
 
-var refreshPrice = function (e) {
-  e.querySelector('.card-order__price-value').textContent = +e.getAttribute('data-price') * +e.querySelector('.card-order__count').value;
-};
+var refreshData = function (e) {
+  var i = e.getAttribute('data-index');
+  e.querySelector('.card-order__price-value').textContent = Number(e.getAttribute('data-price')) * basketObjArray[i].orderedAmount;
 
-// var increaseValue = function (el) {
-//   el.querySelector('.card-order__count').value = el.querySelector('.card-order__count').value + 1;
-// };
-//
-// var decreaseValue = function (el) {
-//   if (el.querySelector('.card-order__count').value === 0) {
-//     return;
-//   } else {
-//     el.querySelector('.card-order__count').value = el.querySelector('.card-order__count').value - 1;
-//   }
-// };
-
-var onFavouriteButtonsClick = function () {
-  var favouriteButtons = [].slice.call(document.querySelectorAll('.card__btn-favorite'));
-  favouriteButtons.forEach(function (element) {
-    element.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      element.classList.toggle('card__btn-favorite--selected');
-    });
+  var renderedCards = [].slice.call(document.querySelectorAll('.catalog__cards .card'));
+  var amountClass;
+  objArray.forEach(function (element, index) {
+    renderedCards[index].classList.remove('card--in-stock');
+    renderedCards[index].classList.remove('card--little');
+    renderedCards[index].classList.remove('card--soon');
+    if (element.amount > 5) {
+      amountClass = 'card--in-stock';
+    } else if (element.amount >= 1 && element.amount <= 5) {
+      amountClass = 'card--little';
+    } else {
+      amountClass = 'card--soon';
+    }
+    renderedCards[index].classList.add(amountClass);
   });
 };
 
-var checkCards = function () {
-  var renderedGoodsArray = [].slice.call(document.querySelectorAll('.catalog__card'));
-  var addButtons = [].slice.call(document.querySelectorAll('.card__btn'));
-  var clickedCard;
-  var index;
-  var currentCopiedObject;
+var onAddButtonClick = function (event) {
+  event.preventDefault();
+  var clickedCard = event.target.closest('.catalog__card');
+  var index = Number(clickedCard.getAttribute('data-index'));
+  var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + index + '"]');
 
-  addButtons.forEach(function (element) {
-    element.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      clickedCard = evt.target.closest('.catalog__card');
-      index = renderedGoodsArray.indexOf(clickedCard);
-      currentCopiedObject = copyObj(index);
-      var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]');
+  if (clickedCard.classList.contains('card--soon')) {
+    return;
+  }
 
-      if (renderedGoodsArray[index].classList.contains('card--soon')) {
-        return;
-      }
+  if (duplicateBasketCard !== null && objArray[index].amount !== 0) {
+    objArray[index].amount = objArray[index].amount - 1;
+    basketObjArray[index].orderedAmount = basketObjArray[index].orderedAmount + 1;
+    duplicateBasketCard.querySelector('.card-order__count').value = basketObjArray[index].orderedAmount;
+  } else if (duplicateBasketCard !== null) {
+    return;
+  } else {
+    createBasketGoods(basketObjArray[index]);
+  }
 
-      if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value < currentCopiedObject.amount) {
-        duplicateBasketCard.querySelector('.card-order__count').value = +duplicateBasketCard.querySelector('.card-order__count').value + 1;
-      } else if (duplicateBasketCard !== null && duplicateBasketCard.querySelector('.card-order__count').value >= currentCopiedObject.amount) {
-        return;
-      } else {
-        createBasketGoods(currentCopiedObject);
-      }
-
-      refreshPrice(document.querySelector('.goods_card[data-index="' + currentCopiedObject.index + '"]'));
-      checkBasketArray();
-    });
-  });
+  refreshData(document.querySelector('.goods_card[data-index="' + index + '"]'));
+  checkBasketArray();
 };
 
 var createGoodsArray = function (array) {
   for (var j = 0; j < array.length; j++) {
-    generateItem(array[j]);
+    renderGoodsCard(array[j]);
   }
-
-  onFavouriteButtonsClick();
-  checkCards();
 
   return array;
 };
