@@ -1,10 +1,10 @@
 'use strict';
 var form = document.querySelector('.buy form');
 
-// var contactsFields = form.querySelector('.contact-data');
-// var inputName = contactsFields.querySelector('#contact-data__name');
-// var inputTel = contactsFields.querySelector('#contact-data__tel');
-// var inputEmail = contactsFields.querySelector('#contact-data__email');
+var contactsFields = form.querySelector('.contact-data');
+var inputName = contactsFields.querySelector('#contact-data__name');
+var inputTel = contactsFields.querySelector('#contact-data__tel');
+var inputEmail = contactsFields.querySelector('#contact-data__email');
 
 var paymentFields = form.querySelector('.payment');
 var paymentMethod = paymentFields.querySelector('.payment__method');
@@ -29,7 +29,7 @@ var deliveryRoom = delivery.querySelector('#deliver__room');
 // Блоки-переключатели
 var addAttrDisabled = function (element) {
   if (!element.hasAttribute('disabled')) {
-    element.setAttribute('disabled', '');
+    element.disabled = true;
   }
 };
 
@@ -79,26 +79,27 @@ deliveryInputs.forEach(function (elem) {
   });
 });
 
-// // Валидация форм
-// form.addEventListener('submit', function (evt) {
-//   validate(evt);
-// });
-//
-// var validate = function (evt) {
-//   if (validateContacts() && validatePayments() && validateDelivery()) {
-//     evt.preventDefault();
-//   }
-// };
-//
-// var validateContacts = function () {
-//   var checkName = function() {
-//       return inputName.value.length === 0;
-//   };
-//
-//   if ( || inputTel.value.length === 0 || inputEmail.value.length === 0) {
-//
-//   }
-// };
+// Валидация форм
+form.addEventListener('submit', function (evt) {
+  validate(evt);
+});
+
+var validate = function (evt) {
+  if (validateContacts()) {
+    evt.preventDefault();
+  }
+};
+
+var checkInput = function (input) {
+  return input.value.length !== 0;
+};
+
+var validateContacts = function () {
+  checkInput(inputName);
+  checkInput(inputTel);
+  checkInput(inputEmail);
+};
+
 //
 // var checkCard = function (number) {
 //   var array = number.value.split('').map(function (element, index) {
