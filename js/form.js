@@ -35,7 +35,7 @@ var addAttrDisabled = function (element) {
 
 var removeAttrDisabled = function (element) {
   if (element.hasAttribute('disabled')) {
-    element.removeAttribute('disabled');
+    element.disabled = false;
   }
 };
 
