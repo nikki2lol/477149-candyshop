@@ -11,71 +11,53 @@ var paymentMethod = paymentFields.querySelector('.payment__method');
 var paymentInputs = [].slice.call(paymentMethod.querySelectorAll('input'));
 var paymentCardWrapper = paymentFields.querySelector('.payment__card-wrap');
 var paymentCashWrapper = paymentFields.querySelector('.payment__cash-wrap');
-var cardNumber = paymentFields.querySelector('#payment__card-number');
-var cardDate = paymentFields.querySelector('#payment__card-date');
-var cardCvc = paymentFields.querySelector('#payment__card-cvc');
-var cardHolder = paymentFields.querySelector('#payment__cardholder');
+// var cardNumber = paymentFields.querySelector('#payment__card-number');
+// var cardDate = paymentFields.querySelector('#payment__card-date');
+// var cardCvc = paymentFields.querySelector('#payment__card-cvc');
+// var cardHolder = paymentFields.querySelector('#payment__cardholder');
 
 var delivery = form.querySelector('.deliver');
 var deliveryMethod = delivery.querySelector('.deliver__toggle');
 var deliveryInputs = [].slice.call(deliveryMethod.querySelectorAll('input'));
 var deliveryStore = delivery.querySelector('.deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
-var deliveryStreet = delivery.querySelector('#deliver__street');
-var deliveryHouse = delivery.querySelector('#deliver__house');
-var deliveryFloor = delivery.querySelector('#deliver__floor');
-var deliveryRoom = delivery.querySelector('#deliver__room');
+// var deliveryStreet = delivery.querySelector('#deliver__street');
+// var deliveryHouse = delivery.querySelector('#deliver__house');
+// var deliveryFloor = delivery.querySelector('#deliver__floor');
+// var deliveryRoom = delivery.querySelector('#deliver__room');
 
 // Блоки-переключатели
-var addAttrDisabled = function (element) {
-  if (!element.hasAttribute('disabled')) {
-    element.disabled = true;
-  }
+var addAttrDisabled = function (container) {
+  [].slice.call(container.querySelectorAll('input')).forEach(function (e) {
+    e.disabled = true;
+  });
 };
 
-var removeAttrDisabled = function (element) {
-  if (element.hasAttribute('disabled')) {
-    element.disabled = false;
-  }
+var removeAttrDisabled = function (container) {
+  [].slice.call(container.querySelectorAll('input')).forEach(function (e) {
+    e.disabled = false;
+  });
 };
 
 paymentInputs.forEach(function (elem) {
-  elem.addEventListener('change', function () {
-    if (elem.checked && elem.value === 'card') {
-      paymentCardWrapper.classList.remove('visually-hidden');
-      paymentCashWrapper.classList.add('visually-hidden');
-      removeAttrDisabled(cardNumber);
-      removeAttrDisabled(cardDate);
-      removeAttrDisabled(cardCvc);
-      removeAttrDisabled(cardHolder);
-    } else if (elem.checked && elem.value === 'cash') {
-      paymentCashWrapper.classList.remove('visually-hidden');
-      paymentCardWrapper.classList.add('visually-hidden');
-      addAttrDisabled(cardNumber);
-      addAttrDisabled(cardDate);
-      addAttrDisabled(cardCvc);
-      addAttrDisabled(cardHolder);
-    }
+  elem.addEventListener('change', function (evt) {
+    var target = evt.target;
+    paymentCardWrapper.classList.toggle('visually-hidden');
+    addAttrDisabled(paymentCardWrapper);
+    paymentCashWrapper.classList.toggle('visually-hidden');
+    addAttrDisabled(paymentCashWrapper);
+    removeAttrDisabled(form.querySelector('.' + target.id + '-wrap'));
   });
 });
 
 deliveryInputs.forEach(function (elem) {
-  elem.addEventListener('change', function () {
-    if (elem.checked && elem.value === 'store') {
-      deliveryStore.classList.remove('visually-hidden');
-      deliveryCourier.classList.add('visually-hidden');
-      addAttrDisabled(deliveryStreet);
-      addAttrDisabled(deliveryHouse);
-      addAttrDisabled(deliveryFloor);
-      addAttrDisabled(deliveryRoom);
-    } else if (elem.checked && elem.value === 'courier') {
-      deliveryStore.classList.add('visually-hidden');
-      deliveryCourier.classList.remove('visually-hidden');
-      removeAttrDisabled(deliveryStreet);
-      removeAttrDisabled(deliveryHouse);
-      removeAttrDisabled(deliveryFloor);
-      removeAttrDisabled(deliveryRoom);
-    }
+  elem.addEventListener('change', function (evt) {
+    var target = evt.target;
+    deliveryStore.classList.toggle('visually-hidden');
+    addAttrDisabled(deliveryStore);
+    deliveryCourier.classList.toggle('visually-hidden');
+    addAttrDisabled(deliveryCourier);
+    removeAttrDisabled(form.querySelector('.' + target.id));
   });
 });
 
