@@ -29,9 +29,10 @@ var deliveryRoom = delivery.querySelector('#deliver__room');
 var successPopup = document.querySelector('#modal-success');
 
 // Блоки-переключатели
-var setupAttrDisabled = function (container, boolean) {
+var toogleDisabled = function (container, flag) {
   [].slice.call(container.querySelectorAll('input')).forEach(function (e) {
-    e.disabled = boolean;
+    container.classList.toggle('visually-hidden');
+    e.disabled = flag;
   });
 };
 
@@ -39,10 +40,10 @@ paymentInputs.forEach(function (elem) {
   elem.addEventListener('change', function (evt) {
     var target = evt.target;
     paymentCardWrapper.classList.toggle('visually-hidden');
-    setupAttrDisabled(paymentCardWrapper, true);
+    toogleDisabled(paymentCardWrapper, true);
     paymentCashWrapper.classList.toggle('visually-hidden');
-    setupAttrDisabled(paymentCashWrapper, true);
-    setupAttrDisabled(form.querySelector('.' + target.id + '-wrap'), false);
+    toogleDisabled(paymentCashWrapper, true);
+    toogleDisabled(form.querySelector('.' + target.id + '-wrap'), false);
   });
 });
 
@@ -50,10 +51,10 @@ deliveryInputs.forEach(function (elem) {
   elem.addEventListener('change', function (evt) {
     var target = evt.target;
     deliveryStore.classList.toggle('visually-hidden');
-    setupAttrDisabled(deliveryStore, true);
+    toogleDisabled(deliveryStore, true);
     deliveryCourier.classList.toggle('visually-hidden');
-    setupAttrDisabled(deliveryCourier, true);
-    setupAttrDisabled(form.querySelector('.' + target.id), false);
+    toogleDisabled(deliveryCourier, true);
+    toogleDisabled(form.querySelector('.' + target.id), false);
   });
 });
 
@@ -66,9 +67,7 @@ var checkCardValue = function (input) {
 };
 
 var validate = function (evt) {
-  if (!validateRequiredInputs) {
-    evt.preventDefault();
-  } else {
+  if (validateRequiredInputs) {
     evt.preventDefault();
     successPopup.classList.remove('modal--hidden');
     successPopup.querySelector('.modal__close').addEventListener('click', function () {
@@ -91,11 +90,6 @@ var checkCard = function (number) {
     return x + y;
   }) % 10 === 0;
 };
-
-// cardNumber.addEventListener('input', function () {
-//   console.log(cardNumber.value, 'cardNumber.value');
-//   console.log(checkCard(cardNumber), 'cardNumber');
-// });
 
 var validateRequiredInputs = function () {
   checkInput(inputName);

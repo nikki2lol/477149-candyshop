@@ -235,33 +235,28 @@ var createBasketGoods = function (obj) {
     refreshData(goodsElement);
   });
 
-  goodsElement.querySelector('.card-order__btn--decrease').addEventListener('click', function (evt) {
+  var changeValue = function (evt) {
     evt.preventDefault();
     var value = +goodsElement.querySelector('.card-order__count').value;
-    if (value < 1) {
-      return;
-    } else {
+    if (evt.target.classList.contains('card-order__btn--decrease') && value >= 1) {
       value = value - 1;
       goodsElement.querySelector('.card-order__count').value = value;
       objArray[obj.index].amount = objArray[obj.index].amount + 1;
       basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount - 1;
-      refreshData(goodsElement);
     }
-  });
-
-  goodsElement.querySelector('.card-order__btn--increase').addEventListener('click', function (evt) {
-    evt.preventDefault();
-    var value = +goodsElement.querySelector('.card-order__count').value;
-    if (value >= obj.amount) {
-      return;
-    } else {
+    if (evt.target.classList.contains('card-order__btn--increase') && value < obj.amount) {
       value = value + 1;
       goodsElement.querySelector('.card-order__count').value = value;
       objArray[obj.index].amount = objArray[obj.index].amount - 1;
       basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount + 1;
-      refreshData(goodsElement);
     }
-  });
+    refreshData(goodsElement);
+  };
+
+  var btnDecrease = goodsElement.querySelector('.card-order__btn--decrease');
+  btnDecrease.addEventListener('click', changeValue);
+  var btnIncrease = goodsElement.querySelector('.card-order__btn--increase');
+  btnIncrease.addEventListener('click', changeValue);
 
   basketCards.appendChild(goodsElement);
 };
