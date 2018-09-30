@@ -11,18 +11,11 @@ var rangePriceMin = catalogRangeFilter.querySelector('.range__price--min');
 var rangePriceMax = catalogRangeFilter.querySelector('.range__price--max');
 
 range.addEventListener('click', function (evt) {
-  // console.log(evt.clientX, 'evt.clientX');
-  // console.log(range.offsetLeft, 'range.offsetLeft');
-  // console.log(range.offsetWidth, 'range.offsetWidth');
   var rangeWidth = range.offsetWidth;
   var offsetLeft = range.offsetLeft;
   var offsetRight = offsetLeft + rangeWidth;
   var leftValue = (evt.clientX - offsetLeft) * 100 / rangeWidth;
   var rightValue = (100 - (evt.clientX - offsetLeft) * 100 / rangeWidth);
-  // console.log(evt.target, 'evt.target');
-  // console.log(evt.clientX, 'evt.clientX');
-  // console.log(evt.clientX - offsetLeft);
-  // console.log(evt.clientX, 'evt.clientX');
 
   if (evt.clientX <= offsetLeft) {
     rangeLeft.style.left = 0;
