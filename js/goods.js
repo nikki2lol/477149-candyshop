@@ -218,53 +218,6 @@ var renderGoodsCard = function (item) {
   catalogCards.appendChild(goodsElement);
 };
 
-// функция для генерации дом-элементов карточек товара (корзина)
-var createBasketGoods = function (obj) {
-  var goodsElement = basketTemplate.cloneNode(true);
-  goodsElement.dataset.index = obj.index;
-  goodsElement.querySelector('.card-order__title').textContent = obj.name;
-  goodsElement.querySelector('.card-order__img').src = obj.picture;
-  goodsElement.querySelector('.card-order__price-value').textContent = obj.price;
-  goodsElement.dataset.price = obj.price;
-  goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
-
-  goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
-    evt.preventDefault();
-    objArray[obj.index].amount = basketObjArray[findObj(obj.index)].amount;
-    basketObjArray[findObj(obj.index)].orderedAmount = 0;
-    goodsElement.querySelector('.card-order__count').value = 1;
-    goodsElement.parentNode.removeChild(goodsElement);
-    basketObjArray.splice(findObj(obj.index), 1);
-    checkBasketArray();
-    refreshData(goodsElement);
-  });
-
-  var changeValue = function (evt) {
-    evt.preventDefault();
-    var value = +goodsElement.querySelector('.card-order__count').value;
-    if (evt.target.classList.contains('card-order__btn--decrease') && value >= 1) {
-      value = value - 1;
-      goodsElement.querySelector('.card-order__count').value = value;
-      objArray[obj.index].amount = objArray[obj.index].amount + 1;
-      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount - 1;
-    }
-    if (evt.target.classList.contains('card-order__btn--increase') && value < obj.amount) {
-      value = value + 1;
-      goodsElement.querySelector('.card-order__count').value = value;
-      objArray[obj.index].amount = objArray[obj.index].amount - 1;
-      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount + 1;
-    }
-    refreshData(goodsElement);
-  };
-
-  var btnDecrease = goodsElement.querySelector('.card-order__btn--decrease');
-  btnDecrease.addEventListener('click', changeValue);
-  var btnIncrease = goodsElement.querySelector('.card-order__btn--increase');
-  btnIncrease.addEventListener('click', changeValue);
-
-  basketCards.appendChild(goodsElement);
-};
-
 // Функция для пересчета товаров, суммы и шапки корзины
 var checkBasketArray = function () {
   var basketArray = [].slice.call(document.querySelectorAll('.goods_card.card-order'));
@@ -298,9 +251,60 @@ var checkBasketArray = function () {
   }
 };
 
-var refreshData = function (e) {
-  e.querySelector('.card-order__price-value').textContent = Number(e.getAttribute('data-price'));
+var deleteFromBasket = function (evt, element, obj) {
+  evt.preventDefault();
+  objArray[obj.index].amount = basketObjArray[findObj(obj.index)].amount;
+  basketObjArray[findObj(obj.index)].orderedAmount = 0;
+  element.querySelector('.card-order__count').value = 1;
+  element.parentNode.removeChild(element);
+  basketObjArray.splice(findObj(obj.index), 1);
+  checkBasketArray();
+  refreshData();
+};
 
+// функция для генерации дом-элементов карточек товара (корзина)
+var createBasketGoods = function (obj) {
+  var goodsElement = basketTemplate.cloneNode(true);
+  goodsElement.dataset.index = obj.index;
+  goodsElement.querySelector('.card-order__title').textContent = obj.name;
+  goodsElement.querySelector('.card-order__img').src = obj.picture;
+  goodsElement.querySelector('.card-order__price-value').textContent = obj.price;
+  goodsElement.dataset.price = obj.price;
+  goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
+  goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
+    deleteFromBasket(evt, goodsElement, obj);
+  });
+
+  var changeValue = function (evt) {
+    evt.preventDefault();
+    var value = +goodsElement.querySelector('.card-order__count').value;
+    if (evt.target.classList.contains('card-order__btn--decrease') && value > 1) {
+      value = value - 1;
+      goodsElement.querySelector('.card-order__count').value = value;
+      objArray[obj.index].amount = objArray[obj.index].amount + 1;
+      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount - 1;
+    } else if (evt.target.classList.contains('card-order__btn--decrease') && value <= 1) {
+      deleteFromBasket(evt, goodsElement, obj);
+    }
+    if (evt.target.classList.contains('card-order__btn--increase') && value < obj.amount) {
+      value = value + 1;
+      goodsElement.querySelector('.card-order__count').value = value;
+      objArray[obj.index].amount = objArray[obj.index].amount - 1;
+      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount + 1;
+    }
+    refreshData();
+    checkBasketArray();
+  };
+
+  var btnDecrease = goodsElement.querySelector('.card-order__btn--decrease');
+  btnDecrease.addEventListener('click', changeValue);
+  var btnIncrease = goodsElement.querySelector('.card-order__btn--increase');
+  btnIncrease.addEventListener('click', changeValue);
+
+  basketCards.appendChild(goodsElement);
+};
+
+var refreshData = function () {
   var renderedCards = [].slice.call(document.querySelectorAll('.catalog__cards .card'));
   var amountClass;
   objArray.forEach(function (element, index) {
@@ -326,7 +330,7 @@ var onAddButtonClick = function (event) {
   var curBasketObj = basketObjArray[findObj(index)];
 
   if (objArray[index].amount === 0) {
-    refreshData(document.querySelector('.goods_card[data-index="' + index + '"]'));
+    refreshData();
     return;
   }
 
@@ -341,7 +345,7 @@ var onAddButtonClick = function (event) {
     createBasketGoods(copyObj(index));
   }
 
-  refreshData(document.querySelector('.goods_card[data-index="' + index + '"]'));
+  refreshData();
   checkBasketArray();
 };
 
