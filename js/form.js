@@ -13,6 +13,7 @@ var paymentCard = paymentMethod.querySelector('#payment__card');
 var paymentCashWrapper = paymentFields.querySelector('.payment__cash-wrap');
 var paymentCash = paymentMethod.querySelector('#payment__cash');
 var paymentInputs = [].slice.call(paymentCardWrapper.querySelectorAll('input'));
+var paymentRadioBtn = [].slice.call(paymentMethod.querySelectorAll('.toggle-btn__input'));
 var cardNumber = paymentFields.querySelector('#payment__card-number');
 var cardDate = paymentFields.querySelector('#payment__card-date');
 var cardCvc = paymentFields.querySelector('#payment__card-cvc');
@@ -25,6 +26,7 @@ var deliveryStoreBtn = delivery.querySelector('#deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
 var deliveryCourierBtn = delivery.querySelector('#deliver__courier');
 var deliveryInputs = [].slice.call(deliveryCourier.querySelectorAll('input'));
+var deliveryRadioBtn = [].slice.call(deliveryMethod.querySelectorAll('.toggle-btn__input'));
 var deliveryStreet = delivery.querySelector('#deliver__street');
 var deliveryHouse = delivery.querySelector('#deliver__house');
 var deliveryFloor = delivery.querySelector('#deliver__floor');
@@ -33,30 +35,31 @@ var deliveryRoom = delivery.querySelector('#deliver__room');
 var successPopup = document.querySelector('#modal-success');
 
 // Блоки-переключатели
-var toggleDisabled = function () {
+var togglePayment = function () {
   paymentCardWrapper.classList.toggle('visually-hidden', paymentCash.checked);
   paymentCashWrapper.classList.toggle('visually-hidden', paymentCard.checked);
-
-  deliveryStore.classList.toggle('visually-hidden', deliveryCourierBtn.checked);
-  deliveryCourier.classList.toggle('visually-hidden', deliveryStoreBtn.checked);
 
   paymentInputs.forEach(function (elem) {
     elem.disabled = paymentCash.checked;
   });
+};
+
+var toggleDelivery = function () {
+  deliveryStore.classList.toggle('visually-hidden', deliveryCourierBtn.checked);
+  deliveryCourier.classList.toggle('visually-hidden', deliveryStoreBtn.checked);
 
   deliveryInputs.forEach(function (elem) {
     elem.disabled = deliveryStoreBtn.checked;
   });
 };
 
-var onToggleBlockClick = function (evt) {
-  var target = evt.target;
-  target.checked = true;
-  toggleDisabled();
-};
+paymentRadioBtn.forEach(function (elem) {
+  elem.addEventListener('change', togglePayment);
+});
 
-paymentMethod.addEventListener('click', onToggleBlockClick);
-deliveryMethod.addEventListener('click', onToggleBlockClick);
+deliveryRadioBtn.forEach(function (elem) {
+  elem.addEventListener('change', toggleDelivery);
+});
 
 var checkInput = function (input) {
   return input.value.length !== 0;
