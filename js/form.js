@@ -15,6 +15,7 @@ var paymentCashWrapper = paymentFields.querySelector('.payment__cash-wrap');
 var paymentCash = paymentMethod.querySelector('#payment__cash');
 var paymentInputs = [].slice.call(paymentCardWrapper.querySelectorAll('input'));
 var paymentRadioBtn = [].slice.call(paymentMethod.querySelectorAll('.toggle-btn__input'));
+var paymentCardStatus = paymentFields.querySelector('.payment__card-status');
 var cardNumber = paymentFields.querySelector('#payment__card-number');
 var cardDate = paymentFields.querySelector('#payment__card-date');
 var cardCvc = paymentFields.querySelector('#payment__card-cvc');
@@ -67,7 +68,11 @@ var checkInput = function (input) {
 };
 
 var checkCardValue = function (input) {
-  return input.value.length < MIN_CARD_NUMBER;
+  return input.value.length >= MIN_CARD_NUMBER;
+};
+
+var checkCardCvc = function (cvcElem) {
+  return cvcElem.value >= 100 && cvcElem.value <= 999 && cvcElem.value.length === 3;
 };
 
 var validate = function (evt) {
@@ -80,7 +85,7 @@ var validate = function (evt) {
   }
 };
 
-var checkCard = function (number) {
+var checkCardNumber = function (number) {
   var array = number.value.split('').map(function (element, index) {
     var numeral = parseInt(element, 10);
     if (index === 0 || index % 2 === 0) {
@@ -95,15 +100,25 @@ var checkCard = function (number) {
   }) % 10 === 0;
 };
 
+var validateCardData = function () {
+  if (checkCardValue(cardNumber) && checkCardNumber(cardNumber) && checkInput(cardDate) && checkCardCvc(cardCvc) && checkInput(cardHolder)) {
+    paymentCardStatus.textContent = 'Одобрен';
+  } else {
+    paymentCardStatus.textContent = 'Не определён';
+  }
+};
+
+paymentInputs.forEach(function (elem) {
+  elem.addEventListener('input', function () {
+    validateCardData();
+  });
+});
+
 var validateRequiredInputs = function () {
   checkInput(inputName);
   checkInput(inputTel);
   checkInput(inputEmail);
-  checkCardValue(cardNumber);
-  checkCard(cardNumber.value);
-  checkInput(cardDate);
-  checkInput(cardCvc);
-  checkInput(cardHolder);
+  validateCardData();
   checkInput(deliveryStreet);
   checkInput(deliveryHouse);
   checkInput(deliveryFloor);
