@@ -134,7 +134,7 @@ var makeRandomGoods = function (i) {
     nutritionFacts: {
       sugar: Math.random() > 0.5,
       energy: getRandomNumber(MIN_ENERGY, MAX_ENERGY),
-      contents: getRandomArray(CONTENTS),
+      contents: getRandomArray(CONTENTS).join(', ')
     },
     index: i
   };
