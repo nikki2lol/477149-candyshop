@@ -1,5 +1,6 @@
 'use strict';
 var MIN_CARD_NUMBER = 16;
+var ESC_KEYCODE = 27;
 var form = document.querySelector('.buy form');
 
 var contactsFields = form.querySelector('.contact-data');
@@ -39,6 +40,22 @@ var deliveryStoreMap = delivery.querySelector('.deliver__store-map-wrap');
 var deliveryMapImage = deliveryStoreMap.querySelector('.deliver__store-map-img');
 
 var successPopup = document.querySelector('#modal-success');
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeSuccessPopup();
+  }
+};
+
+var showSuccessPopup = function () {
+  successPopup.classList.remove('modal--hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var closeSuccessPopup = function () {
+  successPopup.classList.add('modal--hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
 
 // Блоки-переключатели
 var togglePayment = function () {
@@ -90,10 +107,8 @@ var checkCardCvc = function (cvcElem) {
 var validate = function (evt) {
   if (validateRequiredInputs) {
     evt.preventDefault();
-    successPopup.classList.remove('modal--hidden');
-    successPopup.querySelector('.modal__close').addEventListener('click', function () {
-      successPopup.classList.add('modal--hidden');
-    });
+    showSuccessPopup();
+    successPopup.querySelector('.modal__close').addEventListener('click', closeSuccessPopup);
   }
 };
 
@@ -118,6 +133,7 @@ var validateCardData = function () {
   } else {
     paymentCardStatus.textContent = 'Не определён';
   }
+  return checkCardValue(cardNumber) && checkCardNumber(cardNumber) && checkInput(cardDate) && checkCardCvc(cardCvc) && checkInput(cardHolder);
 };
 
 paymentInputs.forEach(function (elem) {
