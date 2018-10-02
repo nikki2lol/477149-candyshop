@@ -33,6 +33,10 @@ var deliveryStreet = delivery.querySelector('#deliver__street');
 var deliveryHouse = delivery.querySelector('#deliver__house');
 var deliveryFloor = delivery.querySelector('#deliver__floor');
 var deliveryRoom = delivery.querySelector('#deliver__room');
+var deliveryStoreList = delivery.querySelector('.deliver__store-list');
+var deliveryStoreItems = [].slice.call(deliveryStoreList.querySelectorAll('.deliver__store-item'));
+var deliveryStoreMap = delivery.querySelector('.deliver__store-map-wrap');
+var deliveryMapImage = deliveryStoreMap.querySelector('.deliver__store-map-img');
 
 var successPopup = document.querySelector('#modal-success');
 
@@ -63,6 +67,14 @@ deliveryRadioBtn.forEach(function (elem) {
   elem.addEventListener('change', toggleDelivery);
 });
 
+deliveryStoreItems.forEach(function (elem) {
+  elem.addEventListener('click', function () {
+    deliveryMapImage.src = 'img/map/' + elem.querySelector('input').value + '.jpg';
+    deliveryMapImage.alt = elem.querySelector('label').textContent;
+  });
+});
+
+// функции для валидации
 var checkInput = function (input) {
   return input.value.length !== 0;
 };
