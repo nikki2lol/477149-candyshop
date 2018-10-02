@@ -1,4 +1,5 @@
 'use strict';
+var MIN_CARD_NUMBER = 16;
 var form = document.querySelector('.buy form');
 
 var contactsFields = form.querySelector('.contact-data');
@@ -66,7 +67,7 @@ var checkInput = function (input) {
 };
 
 var checkCardValue = function (input) {
-  return input.value.length < 16;
+  return input.value.length < MIN_CARD_NUMBER;
 };
 
 var validate = function (evt) {

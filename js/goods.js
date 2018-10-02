@@ -206,6 +206,10 @@ var renderGoodsCard = function (item) {
     onAddButtonClick(evt);
   });
 
+  goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
+    goodsElement.querySelector('.card__composition').classList.toggle('card__composition--hidden');
+  });
+
   goodsElement.querySelector('.card__btn-favorite').addEventListener('click', function (evt) {
     evt.preventDefault();
     goodsElement.querySelector('.card__btn-favorite').classList.toggle('card__btn-favorite--selected');
@@ -278,9 +282,7 @@ var checkBasketArray = function () {
       basketValue.push(+element.querySelector('.card-order__count').value);
     });
 
-    basketTotalValue = basketValue.reduce(function (a, b) {
-      return a + b;
-    });
+    basketTotalValue = basketValue.length;
 
     basketArray.forEach(function (element) {
       basketPrice.push(+element.querySelector('.card-order__price-value').textContent * element.querySelector('.card-order__count').value);
