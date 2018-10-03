@@ -96,6 +96,7 @@ var CATALOG_COUNT = 26;
 var catalogCards = document.querySelector('.catalog__cards');
 var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 var basketCards = document.querySelector('.goods__cards');
+var basketEmptyBlock = basketCards.querySelector('.goods__card-empty');
 var basketTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 var basketHeader = document.querySelector('.main-header__basket');
 var picturesArray = PICTURES.slice();
@@ -220,46 +221,25 @@ var renderGoodsCard = function (item) {
 
 // Функция для пересчета товаров, суммы и шапки корзины
 var checkBasketArray = function () {
-  var basketArray = [].slice.call(document.querySelectorAll('.goods_card.card-order'));
-  var basketValue = [];
-  var basketPrice = [];
-  var basketTotalPrice;
-  var basketTotalValue;
-
-  if (basketArray.length === 0) {
+  if (basketObjArray.length === 0) {
     basketCards.classList.add('goods__cards--empty');
-    basketCards.querySelector('.goods__card-empty').classList.remove('visually-hidden');
+    basketEmptyBlock.classList.remove('visually-hidden');
     basketHeader.textContent = 'В корзине ничего нет';
   } else {
-    basketArray.forEach(function (element) {
-      basketValue.push(+element.querySelector('.card-order__count').value);
+    var basketTotalCount = basketObjArray.length;
+    var basketTotalPrice;
+    var basketCurrentPrice = [];
+    basketObjArray.forEach(function (element) {
+      basketCurrentPrice.push(element.price * element.orderedAmount);
     });
-
-    basketTotalValue = basketValue.length;
-
-    basketArray.forEach(function (element) {
-      basketPrice.push(+element.querySelector('.card-order__price-value').textContent * element.querySelector('.card-order__count').value);
-    });
-
-    basketTotalPrice = basketPrice.reduce(function (a, b) {
+    basketTotalPrice = basketCurrentPrice.reduce(function (a, b) {
       return a + b;
     });
 
     basketCards.classList.remove('goods__cards--empty');
-    basketCards.querySelector('.goods__card-empty').classList.add('visually-hidden');
-    basketHeader.textContent = 'В Вашей корзине ' + basketTotalValue + ' товаров на сумму ' + basketTotalPrice + ' Р';
+    basketEmptyBlock.classList.add('visually-hidden');
+    basketHeader.textContent = 'В Вашей корзине ' + basketTotalCount + ' товаров на сумму ' + basketTotalPrice + ' Р';
   }
-};
-
-var deleteFromBasket = function (evt, element, obj) {
-  evt.preventDefault();
-  objArray[obj.index].amount = basketObjArray[findObj(obj.index)].amount;
-  basketObjArray[findObj(obj.index)].orderedAmount = 0;
-  element.querySelector('.card-order__count').value = 1;
-  element.parentNode.removeChild(element);
-  basketObjArray.splice(findObj(obj.index), 1);
-  checkBasketArray();
-  refreshData();
 };
 
 // функция для генерации дом-элементов карточек товара (корзина)
@@ -272,34 +252,44 @@ var createBasketGoods = function (obj) {
   goodsElement.dataset.price = obj.price;
   goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
   goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
-    deleteFromBasket(evt, goodsElement, obj);
+    evt.preventDefault();
+    objArray[obj.index].amount = basketObjArray[findObj(obj.index)].amount;
+    basketObjArray[findObj(obj.index)].orderedAmount = 0;
+    goodsElement.querySelector('.card-order__count').value = 0;
+    goodsElement.parentNode.removeChild(goodsElement);
+    basketObjArray.splice(findObj(obj.index), 1);
+    checkBasketArray();
+    refreshData();
   });
 
-  var changeValue = function (evt) {
+  var changeValue = function (evt, changer) {
     evt.preventDefault();
     var value = +goodsElement.querySelector('.card-order__count').value;
-    if (evt.target.classList.contains('card-order__btn--decrease') && value > 1) {
-      value = value - 1;
-      goodsElement.querySelector('.card-order__count').value = value;
-      objArray[obj.index].amount = objArray[obj.index].amount + 1;
-      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount - 1;
-    } else if (evt.target.classList.contains('card-order__btn--decrease') && value <= 1) {
-      deleteFromBasket(evt, goodsElement, obj);
+    value = value + changer;
+    goodsElement.querySelector('.card-order__count').value = value;
+    objArray[obj.index].amount = objArray[obj.index].amount + changer;
+    basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount + changer;
+
+    if (evt.target.classList.contains('card-order__btn--decrease') && value === 0) {
+      objArray[obj.index].amount = basketObjArray[findObj(obj.index)].amount;
+      basketObjArray[findObj(obj.index)].orderedAmount = 0;
+      goodsElement.querySelector('.card-order__count').value = 1;
+      goodsElement.parentNode.removeChild(goodsElement);
+      basketObjArray.splice(findObj(obj.index), 1);
     }
-    if (evt.target.classList.contains('card-order__btn--increase') && value < obj.amount) {
-      value = value + 1;
-      goodsElement.querySelector('.card-order__count').value = value;
-      objArray[obj.index].amount = objArray[obj.index].amount - 1;
-      basketObjArray[findObj(obj.index)].orderedAmount = basketObjArray[findObj(obj.index)].orderedAmount + 1;
-    }
+
     refreshData();
     checkBasketArray();
   };
 
   var btnDecrease = goodsElement.querySelector('.card-order__btn--decrease');
-  btnDecrease.addEventListener('click', changeValue);
+  btnDecrease.addEventListener('click', function (evt) {
+    changeValue(evt, -1);
+  }, false);
   var btnIncrease = goodsElement.querySelector('.card-order__btn--increase');
-  btnIncrease.addEventListener('click', changeValue);
+  btnIncrease.addEventListener('click', function (evt) {
+    changeValue(evt, 1);
+  }, false);
 
   basketCards.appendChild(goodsElement);
 };
@@ -308,9 +298,7 @@ var refreshData = function () {
   var renderedCards = [].slice.call(document.querySelectorAll('.catalog__cards .card'));
   var amountClass;
   objArray.forEach(function (element, index) {
-    renderedCards[index].classList.remove('card--in-stock');
-    renderedCards[index].classList.remove('card--little');
-    renderedCards[index].classList.remove('card--soon');
+    renderedCards[index].classList.remove('card--in-stock', 'card--little', 'card--soon');
     if (element.amount > 5) {
       amountClass = 'card--in-stock';
     } else if (element.amount >= 1 && element.amount <= 5) {
@@ -325,8 +313,7 @@ var refreshData = function () {
 var onAddButtonClick = function (event) {
   event.preventDefault();
   var clickedCard = event.target.closest('.catalog__card');
-  var index = Number(clickedCard.getAttribute('data-index'));
-  var duplicateBasketCard = document.querySelector('.goods_card[data-index="' + index + '"]');
+  var index = +clickedCard.getAttribute('data-index');
   var curBasketObj = basketObjArray[findObj(index)];
 
   if (objArray[index].amount === 0) {
@@ -334,11 +321,11 @@ var onAddButtonClick = function (event) {
     return;
   }
 
-  if (duplicateBasketCard !== null && objArray[index].amount !== 0) {
+  if (curBasketObj !== undefined && objArray[index].amount !== 0) {
     objArray[index].amount = objArray[index].amount - 1;
-    duplicateBasketCard.querySelector('.card-order__count').value = curBasketObj.orderedAmount + 1;
+    basketCards.querySelector('.goods_card[data-index="' + index + '"] .card-order__count').value = curBasketObj.orderedAmount + 1;
     curBasketObj.orderedAmount = curBasketObj.orderedAmount + 1;
-  } else if (duplicateBasketCard !== null) {
+  } else if (curBasketObj !== undefined) {
     return;
   } else {
     objArray[index].amount = objArray[index].amount - 1;
