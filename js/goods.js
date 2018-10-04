@@ -241,30 +241,26 @@ var checkBasketArray = function () {
 };
 
 var changeValue = function (delta, card, index) {
-  var value = objArray[index].amount;
-  // пока еще не закончил
-  // console.log(value, 'value');
-  // console.log(objArray[index].amount, 'objArray[index].amount');
-  // console.log(basketObjArray[getGoodsItemIndex(index)].orderedAmount, 'basketObjArray[getGoodsItemIndex(index)].orderedAmount');
+  if (objArray[index].amount > 0) {
+    objArray[index].amount = objArray[index].amount + -delta;
+    basketObjArray[getGoodsItemIndex(index)].orderedAmount += delta;
+    card.querySelector('.card-order__count').value = +card.querySelector('.card-order__count').value + delta;
+  } else if (objArray[index].amount === 0 && delta < 0) {
+    objArray[index].amount = objArray[index].amount + -delta;
+    basketObjArray[getGoodsItemIndex(index)].orderedAmount += delta;
+    card.querySelector('.card-order__count').value = +card.querySelector('.card-order__count').value + delta;
+  }
 
-  // if (objArray[index].amount !== 0) {
-  //   value = value + delta;
-  //   card.querySelector('.card-order__count').value = value;
-  //   objArray[index].amount = objArray[index].amount + delta;
-  //   basketObjArray[getGoodsItemIndex(index)].orderedAmount = basketObjArray[getGoodsItemIndex(index)].orderedAmount + delta;
-  // }
-
-  // objArray[index].amount
-
-  if (value === 0) {
+  // для удаления
+  if (basketObjArray[getGoodsItemIndex(index)].orderedAmount === 0) {
     objArray[index].amount = basketObjArray[getGoodsItemIndex(index)].amount;
     basketObjArray[getGoodsItemIndex(index)].orderedAmount = 0;
-    card.querySelector('.card-order__count').value = 1;
+    card.querySelector('.card-order__count').value = 0;
     card.parentNode.removeChild(card);
     basketObjArray.splice(getGoodsItemIndex(index), 1);
   }
 
-  refreshData();
+  refreshData(index);
   checkBasketArray();
 };
 
@@ -286,7 +282,7 @@ var createBasketGoods = function (obj) {
     goodsElement.parentNode.removeChild(goodsElement);
     basketObjArray.splice(getGoodsItemIndex(obj.index), 1);
     checkBasketArray();
-    refreshData();
+    refreshData(obj.index);
   });
 
   goodsElement.querySelector('.card-order__btn--decrease').addEventListener('click', function (evt) {
@@ -302,20 +298,18 @@ var createBasketGoods = function (obj) {
   basketCardsElement.appendChild(goodsElement);
 };
 
-var refreshData = function () {
-  var renderedCards = [].slice.call(document.querySelectorAll('.catalog__cards .card'));
+var refreshData = function (index) {
+  var renderedCard = catalogCardsElement.querySelector('.card[data-index="' + index + '"]');
   var amountClass;
-  objArray.forEach(function (element, index) {
-    renderedCards[index].classList.remove('card--in-stock', 'card--little', 'card--soon');
-    if (element.amount > 5) {
-      amountClass = 'card--in-stock';
-    } else if (element.amount >= 1 && element.amount <= 5) {
-      amountClass = 'card--little';
-    } else {
-      amountClass = 'card--soon';
-    }
-    renderedCards[index].classList.add(amountClass);
-  });
+  renderedCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
+  if (objArray[index].amount > 5) {
+    amountClass = 'card--in-stock';
+  } else if (objArray[index].amount >= 1 && objArray[index].amount <= 5) {
+    amountClass = 'card--little';
+  } else {
+    amountClass = 'card--soon';
+  }
+  renderedCard.classList.add(amountClass);
 };
 
 var onAddButtonClick = function (event) {
@@ -325,14 +319,12 @@ var onAddButtonClick = function (event) {
   var curBasketObj = basketObjArray[getGoodsItemIndex(index)];
 
   if (objArray[index].amount === 0) {
-    refreshData();
+    refreshData(index);
     return;
   }
 
   if (curBasketObj !== undefined && objArray[index].amount !== 0) {
-    objArray[index].amount = objArray[index].amount - 1;
-    basketCardsElement.querySelector('.goods_card[data-index="' + index + '"] .card-order__count').value = curBasketObj.orderedAmount + 1;
-    curBasketObj.orderedAmount = curBasketObj.orderedAmount + 1;
+    changeValue(1, clickedCard, objArray[index]);
   } else if (curBasketObj !== undefined) {
     return;
   } else {
@@ -340,7 +332,7 @@ var onAddButtonClick = function (event) {
     createBasketGoods(copyObj(index));
   }
 
-  refreshData();
+  refreshData(index);
   checkBasketArray();
 };
 
