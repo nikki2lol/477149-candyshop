@@ -312,23 +312,17 @@ var refreshData = function (index) {
   renderedCard.classList.add(amountClass);
 };
 
-var onAddButtonClick = function (event) {
-  event.preventDefault();
-  var clickedCard = event.target.closest('.catalog__card');
+var onAddButtonClick = function (evt) {
+  evt.preventDefault();
+  var clickedCard = evt.target.closest('.catalog__card');
   var index = +clickedCard.getAttribute('data-index');
   var curBasketObj = basketObjArray[getGoodsItemIndex(index)];
 
-  if (objArray[index].amount === 0) {
-    refreshData(index);
-    return;
-  }
-
-  if (curBasketObj !== undefined && objArray[index].amount !== 0) {
-    changeValue(1, clickedCard, objArray[index]);
-  } else if (curBasketObj !== undefined) {
-    return;
+  if (basketObjArray.some(function (element) {
+    return element === curBasketObj;
+  })) {
+    changeValue(1, basketCardsElement.querySelector('.goods_card[data-index="' + index + '"]'), index);
   } else {
-    objArray[index].amount = objArray[index].amount - 1;
     createBasketGoods(copyObj(index));
   }
 
