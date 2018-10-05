@@ -164,7 +164,6 @@ cardHolderElement.addEventListener('invalid', function () {
   cardHolderElement.setCustomValidity(errorText);
 });
 
-
 // Валидация форм
 form.addEventListener('submit', function (evt) {
   validate(evt);
