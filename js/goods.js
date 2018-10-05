@@ -158,7 +158,7 @@ var objArray = generateItemsArray(CATALOG_COUNT);
 var copyObj = function (index) {
   var basketObj = Object.assign({}, objArray[index]);
   basketObj.orderedAmount = 1;
-  basketObj.amount = objArray[index].amount + 1;
+  basketObj.amount = objArray[index].amount;
   basketObjArray.push(basketObj);
   return basketObj;
 };
@@ -238,25 +238,20 @@ var checkBasketArray = function () {
 };
 
 var changeValue = function (delta, card, index) {
-  var currentBusketObj = basketObjArray[getGoodsItemIndex(index)];
-  if (objArray[index].amount > 0) {
+  var currentBasketObj = basketObjArray[getGoodsItemIndex(index)];
+  if (objArray[index].amount > 0 || objArray[index].amount === 0 && delta < 0) {
     objArray[index].amount = objArray[index].amount - delta;
-    currentBusketObj.orderedAmount += delta;
-    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
-  } else if (objArray[index].amount === 0 && delta < 0) {
-    objArray[index].amount = objArray[index].amount - delta;
-    currentBusketObj.orderedAmount += delta;
-    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
+    currentBasketObj.orderedAmount += delta;
+    card.querySelector('.card-order__count').value = currentBasketObj.orderedAmount;
   }
 
   // для удаления
-  if (currentBusketObj.orderedAmount === 0) {
-    objArray[index].amount = currentBusketObj.amount;
-    currentBusketObj.orderedAmount = 0;
-    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
+  if (currentBasketObj.orderedAmount === 0) {
+    objArray[index].amount = currentBasketObj.amount;
+    currentBasketObj.orderedAmount = 0;
+    card.querySelector('.card-order__count').value = currentBasketObj.orderedAmount;
     card.parentNode.removeChild(card);
     basketObjArray.splice(getGoodsItemIndex(index), 1);
-    currentBusketObj.notAdded = true;
   }
 
   refreshData(index);
