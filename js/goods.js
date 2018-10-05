@@ -159,9 +159,6 @@ var copyObj = function (index) {
   var basketObj = Object.assign({}, objArray[index]);
   basketObj.orderedAmount = 1;
   basketObj.amount = objArray[index].amount + 1;
-  delete basketObj.rating;
-  delete basketObj.nutritionFacts;
-  delete basketObj.weight;
   basketObjArray.push(basketObj);
   return basketObj;
 };
@@ -205,7 +202,8 @@ var renderGoodsCard = function (item) {
   goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
   goodsElement.dataset.index = item.index;
   goodsElement.querySelector('.card__btn').addEventListener('click', function (evt) {
-    onAddButtonClick(evt);
+    evt.preventDefault();
+    onAddButtonClick(item.index);
   });
 
   goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
@@ -231,7 +229,6 @@ var checkBasketArray = function () {
     var basketTotalPrice = 0;
     basketObjArray.forEach(function (element) {
       basketTotalPrice = basketTotalPrice + (element.price * element.orderedAmount);
-      return basketTotalPrice;
     });
 
     basketCardsElement.classList.remove('goods__cards--empty');
@@ -241,23 +238,25 @@ var checkBasketArray = function () {
 };
 
 var changeValue = function (delta, card, index) {
+  var currentBusketObj = basketObjArray[getGoodsItemIndex(index)];
   if (objArray[index].amount > 0) {
-    objArray[index].amount = objArray[index].amount + -delta;
-    basketObjArray[getGoodsItemIndex(index)].orderedAmount += delta;
-    card.querySelector('.card-order__count').value = +card.querySelector('.card-order__count').value + delta;
+    objArray[index].amount = objArray[index].amount - delta;
+    currentBusketObj.orderedAmount += delta;
+    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
   } else if (objArray[index].amount === 0 && delta < 0) {
-    objArray[index].amount = objArray[index].amount + -delta;
-    basketObjArray[getGoodsItemIndex(index)].orderedAmount += delta;
-    card.querySelector('.card-order__count').value = +card.querySelector('.card-order__count').value + delta;
+    objArray[index].amount = objArray[index].amount - delta;
+    currentBusketObj.orderedAmount += delta;
+    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
   }
 
   // для удаления
-  if (basketObjArray[getGoodsItemIndex(index)].orderedAmount === 0) {
-    objArray[index].amount = basketObjArray[getGoodsItemIndex(index)].amount;
-    basketObjArray[getGoodsItemIndex(index)].orderedAmount = 0;
-    card.querySelector('.card-order__count').value = 0;
+  if (currentBusketObj.orderedAmount === 0) {
+    objArray[index].amount = currentBusketObj.amount;
+    currentBusketObj.orderedAmount = 0;
+    card.querySelector('.card-order__count').value = currentBusketObj.orderedAmount;
     card.parentNode.removeChild(card);
     basketObjArray.splice(getGoodsItemIndex(index), 1);
+    currentBusketObj.notAdded = true;
   }
 
   refreshData(index);
@@ -312,21 +311,20 @@ var refreshData = function (index) {
   renderedCard.classList.add(amountClass);
 };
 
-var onAddButtonClick = function (evt) {
-  evt.preventDefault();
-  var clickedCard = evt.target.closest('.catalog__card');
-  var index = +clickedCard.getAttribute('data-index');
-  var curBasketObj = basketObjArray[getGoodsItemIndex(index)];
+var onAddButtonClick = function (i) {
+  var curBasketObj = basketObjArray[getGoodsItemIndex(i)];
 
-  if (basketObjArray.some(function (element) {
+  var existObj = basketObjArray.some(function (element) {
     return element === curBasketObj;
-  })) {
-    changeValue(1, basketCardsElement.querySelector('.goods_card[data-index="' + index + '"]'), index);
+  });
+
+  if (existObj) {
+    changeValue(1, basketCardsElement.querySelector('.goods_card[data-index="' + i + '"]'), i);
   } else {
-    createBasketGoods(copyObj(index));
+    createBasketGoods(copyObj(i));
   }
 
-  refreshData(index);
+  refreshData(i);
   checkBasketArray();
 };
 
@@ -334,8 +332,6 @@ var createGoodsArray = function (array) {
   for (var j = 0; j < array.length; j++) {
     renderGoodsCard(array[j]);
   }
-
-  return array;
 };
 
 catalogCardsElement.classList.remove('catalog__cards--load');
