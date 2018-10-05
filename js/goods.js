@@ -245,8 +245,6 @@ var changeValue = function (delta, card, index) {
     objArray[index].amount = objArray[index].amount - delta;
     currentBasketObj.orderedAmount += delta;
     card.querySelector('.card-order__count').value = currentBasketObj.orderedAmount;
-    console.log(currentBasketObj.orderedAmount, 'currentBasketObj.orderedAmount');
-    console.log(objArray[index].amount, 'objArray[index].amount');
   }
 
   // для удаления
