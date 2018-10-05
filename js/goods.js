@@ -159,6 +159,7 @@ var copyObj = function (index) {
   var basketObj = Object.assign({}, objArray[index]);
   basketObj.orderedAmount = 1;
   basketObj.amount = objArray[index].amount;
+  objArray[index].amount = objArray[index].amount - 1;
   basketObjArray.push(basketObj);
   return basketObj;
 };
@@ -239,10 +240,13 @@ var checkBasketArray = function () {
 
 var changeValue = function (delta, card, index) {
   var currentBasketObj = basketObjArray[getGoodsItemIndex(index)];
+
   if (objArray[index].amount > 0 || objArray[index].amount === 0 && delta < 0) {
     objArray[index].amount = objArray[index].amount - delta;
     currentBasketObj.orderedAmount += delta;
     card.querySelector('.card-order__count').value = currentBasketObj.orderedAmount;
+    console.log(currentBasketObj.orderedAmount, 'currentBasketObj.orderedAmount');
+    console.log(objArray[index].amount, 'objArray[index].amount');
   }
 
   // для удаления
@@ -270,13 +274,7 @@ var createBasketGoods = function (obj) {
 
   goodsElement.querySelector('.card-order__close').addEventListener('click', function (evt) {
     evt.preventDefault();
-    objArray[obj.index].amount = basketObjArray[getGoodsItemIndex(obj.index)].amount;
-    basketObjArray[getGoodsItemIndex(obj.index)].orderedAmount = 0;
-    goodsElement.querySelector('.card-order__count').value = 0;
-    goodsElement.parentNode.removeChild(goodsElement);
-    basketObjArray.splice(getGoodsItemIndex(obj.index), 1);
-    checkBasketArray();
-    refreshData(obj.index);
+    changeValue(-obj.orderedAmount, goodsElement, obj.index);
   });
 
   goodsElement.querySelector('.card-order__btn--decrease').addEventListener('click', function (evt) {
