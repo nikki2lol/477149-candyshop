@@ -40,10 +40,11 @@
     }
   };
 
-  var showSuccessPopup = function () {
-    successPopup.classList.remove('modal--hidden');
-    document.addEventListener('keydown', onPopupEscPress);
-  };
+  // var showSuccessPopup = function () {
+  //   successPopup.classList.remove('modal--hidden');
+  //   successPopup.querySelector('.modal__close').addEventListener('click', closeSuccessPopup);
+  //   document.addEventListener('keydown', onPopupEscPress);
+  // };
 
   var closeSuccessPopup = function () {
     successPopup.classList.add('modal--hidden');
@@ -93,14 +94,6 @@
   var validateCardData = function () {
     paymentCardStatusElement.textContent = checkCardNumber(cardInputElement) ? 'Одобрен' : 'Не определён';
     return checkCardNumber(cardInputElement);
-  };
-
-  var validate = function (evt) {
-    if (validateCardData()) {
-      evt.preventDefault();
-      showSuccessPopup();
-      successPopup.querySelector('.modal__close').addEventListener('click', closeSuccessPopup);
-    }
   };
 
   paymentRadioBtnElements.forEach(function (elem) {
@@ -163,7 +156,12 @@
 
   // Валидация форм
   order.addEventListener('submit', function (evt) {
-    validate(evt);
+    evt.preventDefault();
+    if (validateCardData()) {
+      // window.upload(new FormData(order), function (response) {
+      //   showSuccessPopup();
+      // });
+    }
   });
 
   window.ESC_KEYCODE = ESC_KEYCODE;
