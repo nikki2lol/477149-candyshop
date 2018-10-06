@@ -150,7 +150,6 @@
 
   // исходный массив с объектами карточек
   var objArray = generateItemsArray(CATALOG_COUNT);
-  window.objArray = objArray;
 
   // функция для генерации дом-элементов карточек товара (каталог)
   var renderGoodsCard = function (item) {
@@ -205,4 +204,6 @@
   catalogCardsElement.classList.remove('catalog__cards--load');
   catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');
   createGoodsArray(objArray);
+
+  window.objArray = objArray;
 })();

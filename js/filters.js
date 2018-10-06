@@ -54,5 +54,4 @@
 
   rangeLeftPinElement.addEventListener('mousedown', onSliderMouseDown);
   rangeRightPinElement.addEventListener('mousedown', onSliderMouseDown);
-
 })();

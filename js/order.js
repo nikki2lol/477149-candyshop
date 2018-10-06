@@ -2,7 +2,6 @@
 // модуль, содержащий логику формы оформления заказа
 (function () {
   var ESC_KEYCODE = 27;
-  window.ESC_KEYCODE = ESC_KEYCODE;
   var MIN_NUMBER_VALUE_KEYCODE = 48;
   var MAX_NUMBER_VALUE_KEYCODE = 57;
   var order = document.querySelector('.buy .order');
@@ -167,4 +166,5 @@
     validate(evt);
   });
 
+  window.ESC_KEYCODE = ESC_KEYCODE;
 })();
