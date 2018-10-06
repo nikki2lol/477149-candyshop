@@ -28,17 +28,17 @@ var onSliderMouseDown = function (evt) {
   // мы вставили обработчик событий в обработчик событий, чтобы пока пишешь обработчик событий, мог писать обработчик событий
   var onSliderMouseMove = function (event) {
     event.preventDefault();
-    var currentSliderPosition = startCoordX - (evt.clientX - event.clientX);
-    if (currentPin === rangeLeftPinElement && currentSliderPosition < rangeRightPinElement.offsetLeft && currentSliderPosition >= 0) {
-      currentPin.style.left = currentSliderPosition + 'px';
-      rangeLineElement.style.left = currentSliderPosition + SLIDER_WIDTH / 2 + 'px';
-      rangePriceMinElement.textContent = updatePrice(currentSliderPosition);
+    var currentPinPosition = startCoordX - (evt.clientX - event.clientX);
+    if (currentPin === rangeLeftPinElement && currentPinPosition < rangeRightPinElement.offsetLeft && currentPinPosition >= 0) {
+      currentPin.style.left = currentPinPosition + 'px';
+      rangeLineElement.style.left = currentPinPosition + SLIDER_WIDTH / 2 + 'px';
+      rangePriceMinElement.textContent = updatePrice(currentPinPosition);
     }
 
-    if (currentPin === rangeRightPinElement && currentSliderPosition > rangeLeftPinElement.offsetLeft && currentSliderPosition <= rangeWidth) {
-      currentPin.style.left = currentSliderPosition + 'px';
-      rangeLineElement.style.right = rangeWidth - currentSliderPosition + 'px';
-      rangePriceMaxElement.textContent = updatePrice(currentSliderPosition);
+    if (currentPin === rangeRightPinElement && currentPinPosition > rangeLeftPinElement.offsetLeft && currentPinPosition <= rangeWidth) {
+      currentPin.style.left = currentPinPosition + 'px';
+      rangeLineElement.style.right = rangeWidth - currentPinPosition + 'px';
+      rangePriceMaxElement.textContent = updatePrice(currentPinPosition);
     }
   };
 
