@@ -135,12 +135,17 @@
     cardHolderElement.setCustomValidity(errorText);
   });
 
-  // Валидация форм
   orderForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
     if (orderForm.checkValidity()) {
-      window.upload(window.showSuccessPopup, window.showErrorPopup, new FormData(orderForm));
+
+      window.upload(new FormData(orderForm), window.showSuccessPopup, window.showErrorPopup);
       orderForm.reset();
+      paymentCardStatusElement.textContent = 'Не определен';
+      paymentCardElement.checked = true;
+      togglePayment();
+      deliveryStoreBtnElement.checked = true;
+      toggleDelivery();
     }
   });
 

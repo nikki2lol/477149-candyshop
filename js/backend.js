@@ -49,11 +49,11 @@
     xhr.send();
   };
 
-  window.upload = function (onSuccess, onError, data) {
+  window.upload = function (data, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
-    setupRequest(xhr, onSuccess, onError, data);
+    setupRequest(xhr, onSuccess, onError);
     xhr.open('POST', SUBMIT_URL);
-    xhr.send();
+    xhr.send(data);
   };
 
   window.showErrorPopup = function () {
