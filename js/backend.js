@@ -8,7 +8,7 @@
   var STATUS_SERVER_ERROR = 500;
   var TIMEOUT_TIME = 10000;
 
-  var makeRequest = function (xhr, successCallback, errorCallback) {
+  var setupRequest = function (xhr, successCallback, errorCallback) {
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
@@ -44,14 +44,14 @@
 
   window.load = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
-    makeRequest(xhr, onSuccess, onError);
+    setupRequest(xhr, onSuccess, onError);
     xhr.open('GET', GET_URL);
     xhr.send();
   };
 
   window.upload = function (onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
-    makeRequest(xhr, onSuccess, onError, data);
+    setupRequest(xhr, onSuccess, onError, data);
     xhr.open('POST', SUBMIT_URL);
     xhr.send();
   };

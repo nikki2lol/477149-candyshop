@@ -140,6 +140,7 @@
     evt.preventDefault();
     if (orderForm.checkValidity()) {
       window.upload(window.showSuccessPopup, window.showErrorPopup, new FormData(orderForm));
+      orderForm.reset();
     }
   });
 
