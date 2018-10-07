@@ -8,13 +8,14 @@
   var STATUS_SERVER_ERROR = 500;
   var TIMEOUT_TIME = 10000;
 
-  var makeRequest = function (request, successCallback, errorCallback) {
+  var makeRequest = function (xhr, successCallback, errorCallback) {
+    xhr.responseType = 'json';
 
-    request.addEventListener('load', function () {
+    xhr.addEventListener('load', function () {
       var error;
-      switch (request.status) {
+      switch (xhr.status) {
         case STATUS_SUCCESS:
-          successCallback(request.response);
+          successCallback(xhr.response);
           break;
 
         case STATUS_NOT_FOUND:
@@ -26,45 +27,33 @@
           break;
 
         default:
-          error = 'Cтатус ответа: : ' + request.status + ' ' + request.statusText;
+          error = 'Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText;
       }
       if (error) {
-        request(error);
+        xhr(error);
       }
     });
-    request.addEventListener('error', function () {
+    xhr.addEventListener('error', function () {
       errorCallback('Произошла ошибка соединения');
     });
-    request.addEventListener('timeout', function () {
+    xhr.addEventListener('timeout', function () {
       errorCallback('Запрос не успел выполниться за ' + TIMEOUT_TIME + 'мс');
     });
-
+    xhr.timeout = 10000;
   };
 
   window.load = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
-
-    xhr.responseType = 'json';
-
     makeRequest(xhr, onSuccess, onError);
-
-    xhr.timeout = 10000;
-
     xhr.open('GET', GET_URL);
     xhr.send();
   };
 
   window.upload = function (onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
-
-    xhr.responseType = 'json';
-
     makeRequest(xhr, onSuccess, onError, data);
-
-    xhr.timeout = 10000;
-
-    xhr.open('HEAD', SUBMIT_URL);
-    xhr.send(data);
+    xhr.open('POST', SUBMIT_URL);
+    xhr.send();
   };
 
   window.showErrorPopup = function () {
