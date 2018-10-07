@@ -3,21 +3,18 @@
 (function () {
   var GET_URL = 'https://js.dump.academy/candyshop/data';
   var SUBMIT_URL = 'https://js.dump.academy/candyshop';
-  var METHOD_GET = 'GET';
-  var METHOD_POST = 'POST';
   var STATUS_SUCCESS = 200;
   var STATUS_NOT_FOUND = 404;
   var STATUS_SERVER_ERROR = 500;
   var TIMEOUT_TIME = 10000;
 
-  var makeRequest = function (successEvent, errorEvent, requestType, URL, data) {
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-    xhr.addEventListener('load', function () {
+  var makeRequest = function (request, successCallback, errorCallback) {
+
+    request.addEventListener('load', function () {
       var error;
-      switch (xhr.status) {
+      switch (request.status) {
         case STATUS_SUCCESS:
-          successEvent(xhr.response);
+          successCallback(request.response);
           break;
 
         case STATUS_NOT_FOUND:
@@ -29,28 +26,45 @@
           break;
 
         default:
-          error = 'Cтатус ответа: : ' + xhr.status + ' ' + xhr.statusText;
+          error = 'Cтатус ответа: : ' + request.status + ' ' + request.statusText;
       }
       if (error) {
-        xhr(error);
+        request(error);
       }
     });
-    xhr.addEventListener('error', function () {
-      errorEvent('Произошла ошибка соединения');
+    request.addEventListener('error', function () {
+      errorCallback('Произошла ошибка соединения');
     });
-    xhr.addEventListener('timeout', function () {
-      errorEvent('Запрос не успел выполниться за ' + TIMEOUT_TIME + 'мс');
+    request.addEventListener('timeout', function () {
+      errorCallback('Запрос не успел выполниться за ' + TIMEOUT_TIME + 'мс');
     });
-    xhr.open(requestType, URL);
-    xhr.send(data);
+
   };
 
   window.load = function (onSuccess, onError) {
-    makeRequest(onSuccess, onError, METHOD_GET, GET_URL, null);
+    var xhr = new XMLHttpRequest();
+
+    xhr.responseType = 'json';
+
+    makeRequest(xhr, onSuccess, onError);
+
+    xhr.timeout = 10000;
+
+    xhr.open('GET', GET_URL);
+    xhr.send();
   };
 
   window.upload = function (onSuccess, onError, data) {
-    makeRequest(onSuccess, onError, METHOD_POST, SUBMIT_URL, data);
+    var xhr = new XMLHttpRequest();
+
+    xhr.responseType = 'json';
+
+    makeRequest(xhr, onSuccess, onError, data);
+
+    xhr.timeout = 10000;
+
+    xhr.open('HEAD', SUBMIT_URL);
+    xhr.send(data);
   };
 
   window.showErrorPopup = function () {
@@ -61,14 +75,13 @@
     var onClickCloseButton = function () {
       succesPopupElement.classList.add('modal--hidden');
     };
+
     // errorNumberElement.textContent = 'Код ошибки: ' + xhr.status + '.';
     succesPopupElement.classList.remove('modal--hidden');
-
     btnClose.addEventListener('click', onClickCloseButton);
   };
 
   window.showSuccessPopup = function () {
-    // console.log('grats');
     var succesPopupElement = document.querySelector('#modal-success');
     var btnClose = succesPopupElement.querySelector('.modal__close');
 
