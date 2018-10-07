@@ -50,13 +50,7 @@
     return goodsElement;
   };
 
-
-  var onError = function () {
-
-  };
-
-  var onSuccess = function (data) {
-    // console.log(data);
+  var onSuccessLoadData = function (data) {
     window.cards = data;
     var emptyElement = document.createDocumentFragment();
 
@@ -70,5 +64,5 @@
     catalogCardsElement.appendChild(emptyElement);
   };
 
-  window.load(onSuccess, onError);
+  window.load(onSuccessLoadData, window.showErrorPopup);
 })();
