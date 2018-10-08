@@ -4,9 +4,9 @@
   var ESC_KEYCODE = 27;
   var MIN_NUMBER_VALUE_KEYCODE = 48;
   var MAX_NUMBER_VALUE_KEYCODE = 57;
-  var order = document.querySelector('.buy .order');
+  var orderForm = document.querySelector('.buy form');
 
-  var paymentFormElement = order.querySelector('.payment');
+  var paymentFormElement = orderForm.querySelector('.payment');
   var paymentMethodElement = paymentFormElement.querySelector('.payment__method');
   var paymentCardWrapperElement = paymentFormElement.querySelector('.payment__card-wrap');
   var paymentCardElement = paymentMethodElement.querySelector('#payment__card');
@@ -20,7 +20,7 @@
   var cardCvcElement = paymentFormElement.querySelector('#payment__card-cvc');
   var cardHolderElement = paymentFormElement.querySelector('#payment__cardholder');
 
-  var deliveryFormElement = order.querySelector('.deliver');
+  var deliveryFormElement = orderForm.querySelector('.deliver');
   var deliveryMethodElement = deliveryFormElement.querySelector('.deliver__toggle');
   var deliveryStoreElement = deliveryFormElement.querySelector('.deliver__store');
   var deliveryStoreBtnElement = deliveryFormElement.querySelector('#deliver__store');
@@ -31,24 +31,6 @@
   var deliveryStoreItemElements = [].slice.call(deliveryStoreListElement.querySelectorAll('.deliver__store-item'));
   var deliveryStoreMapElement = deliveryFormElement.querySelector('.deliver__store-map-wrap');
   var deliveryMapImageElement = deliveryStoreMapElement.querySelector('.deliver__store-map-img');
-
-  var successPopup = document.querySelector('#modal-success');
-
-  var onPopupEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeSuccessPopup();
-    }
-  };
-
-  var showSuccessPopup = function () {
-    successPopup.classList.remove('modal--hidden');
-    document.addEventListener('keydown', onPopupEscPress);
-  };
-
-  var closeSuccessPopup = function () {
-    successPopup.classList.add('modal--hidden');
-    document.removeEventListener('keydown', onPopupEscPress);
-  };
 
   // Блоки-переключатели
   var togglePayment = function () {
@@ -90,19 +72,6 @@
     }) % 10 === 0;
   };
 
-  var validateCardData = function () {
-    paymentCardStatusElement.textContent = checkCardNumber(cardInputElement) ? 'Одобрен' : 'Не определён';
-    return checkCardNumber(cardInputElement);
-  };
-
-  var validate = function (evt) {
-    if (validateCardData()) {
-      evt.preventDefault();
-      showSuccessPopup();
-      successPopup.querySelector('.modal__close').addEventListener('click', closeSuccessPopup);
-    }
-  };
-
   paymentRadioBtnElements.forEach(function (elem) {
     elem.addEventListener('change', togglePayment);
   });
@@ -116,6 +85,11 @@
       deliveryMapImageElement.src = 'img/map/' + elem.querySelector('input').value + '.jpg';
       deliveryMapImageElement.alt = elem.querySelector('label').textContent;
     });
+  });
+
+  cardInputElement.addEventListener('input', function (evt) {
+    evt.preventDefault();
+    paymentCardStatusElement.textContent = checkCardNumber(cardInputElement) ? 'Одобрен' : 'Не определён';
   });
 
   cardInputElement.addEventListener('keypress', isNumber);
@@ -161,9 +135,18 @@
     cardHolderElement.setCustomValidity(errorText);
   });
 
-  // Валидация форм
-  order.addEventListener('submit', function (evt) {
-    validate(evt);
+  orderForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    if (orderForm.checkValidity()) {
+
+      window.upload(new FormData(orderForm), window.showSuccessPopup, window.showErrorPopup);
+      orderForm.reset();
+      paymentCardStatusElement.textContent = 'Не определен';
+      paymentCardElement.checked = true;
+      togglePayment();
+      deliveryStoreBtnElement.checked = true;
+      toggleDelivery();
+    }
   });
 
   window.ESC_KEYCODE = ESC_KEYCODE;
