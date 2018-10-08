@@ -6,7 +6,7 @@
   var basketEmptyElement = basketCardsElement.querySelector('.goods__card-empty');
   var basketTemplateElement = document.querySelector('#card-order').content.querySelector('.goods_card');
   var basketHeaderElement = document.querySelector('.main-header__basket');
-  var basketObjArray = [];
+  window.basketObjArray = [];
 
   // скопированный и видоизмененный массив для корзины
   var copyObj = function (index) {
@@ -14,14 +14,14 @@
     basketObj.orderedAmount = 1;
     basketObj.amount = window.cards[index].amount;
     window.cards[index].amount = window.cards[index].amount - 1;
-    basketObjArray.push(basketObj);
+    window.basketObjArray.push(basketObj);
     return basketObj;
   };
 
   var getGoodsItemIndex = function (dataIndex) {
     var found;
-    for (var i = 0; i < basketObjArray.length; i++) {
-      if (basketObjArray[i].id === dataIndex) {
+    for (var i = 0; i < window.basketObjArray.length; i++) {
+      if (window.basketObjArray[i].id === dataIndex) {
         found = i;
         return found;
       }
@@ -29,27 +29,8 @@
     return found;
   };
 
-  // Функция для пересчета товаров, суммы и шапки корзины
-  var checkBasketArray = function () {
-    if (basketObjArray.length === 0) {
-      basketCardsElement.classList.add('goods__cards--empty');
-      basketEmptyElement.classList.remove('visually-hidden');
-      basketHeaderElement.textContent = 'В корзине ничего нет';
-    } else {
-      var basketTotalCount = basketObjArray.length;
-      var basketTotalPrice = 0;
-      basketObjArray.forEach(function (element) {
-        basketTotalPrice = basketTotalPrice + (element.price * element.orderedAmount);
-      });
-
-      basketCardsElement.classList.remove('goods__cards--empty');
-      basketEmptyElement.classList.add('visually-hidden');
-      basketHeaderElement.textContent = 'В Вашей корзине ' + basketTotalCount + ' товаров на сумму ' + basketTotalPrice + ' Р';
-    }
-  };
-
   var changeValue = function (delta, card, index) {
-    var currentBasketObj = basketObjArray[getGoodsItemIndex(index)];
+    var currentBasketObj = window.basketObjArray[getGoodsItemIndex(index)];
 
     if (window.cards[index].amount > 0 || window.cards[index].amount === 0 && delta < 0) {
       window.cards[index].amount = window.cards[index].amount - delta;
@@ -63,11 +44,11 @@
       currentBasketObj.orderedAmount = 0;
       card.querySelector('.card-order__count').value = currentBasketObj.orderedAmount;
       card.parentNode.removeChild(card);
-      basketObjArray.splice(getGoodsItemIndex(index), 1);
+      window.basketObjArray.splice(getGoodsItemIndex(index), 1);
     }
 
     refreshData(index);
-    checkBasketArray();
+    window.checkBasketArray();
   };
 
   // функция для генерации дом-элементов карточек товара (корзина)
@@ -112,10 +93,36 @@
     renderedCard.classList.add(amountClass);
   };
 
-  window.onAddButtonClick = function (i) {
-    var curBasketObj = basketObjArray[getGoodsItemIndex(i)];
+  // Функция для пересчета товаров, суммы и шапки корзины
+  window.checkBasketArray = function () {
+    if (window.basketObjArray.length === 0) {
+      basketCardsElement.classList.add('goods__cards--empty');
+      basketEmptyElement.classList.remove('visually-hidden');
+      basketHeaderElement.textContent = 'В корзине ничего нет';
+    } else {
+      var basketTotalCount = window.basketObjArray.length;
+      var basketTotalPrice = 0;
+      window.basketObjArray.forEach(function (element) {
+        basketTotalPrice = basketTotalPrice + (element.price * element.orderedAmount);
+      });
 
-    var existObj = basketObjArray.some(function (element) {
+      basketCardsElement.classList.remove('goods__cards--empty');
+      basketEmptyElement.classList.add('visually-hidden');
+      basketHeaderElement.textContent = 'В Вашей корзине ' + basketTotalCount + ' товаров на сумму ' + basketTotalPrice + ' Р';
+    }
+  };
+
+  window.clearBasketGoods = function () {
+    var currentBasketArray = [].slice.call(basketCardsElement.querySelectorAll('.goods_card'));
+    for (var j = 0; j < currentBasketArray.length; j++) {
+      basketCardsElement.removeChild(currentBasketArray[j]);
+    }
+  };
+
+  window.onAddButtonClick = function (i) {
+    var curBasketObj = window.basketObjArray[getGoodsItemIndex(i)];
+
+    var existObj = window.basketObjArray.some(function (element) {
       return element === curBasketObj;
     });
 
@@ -126,6 +133,7 @@
     }
 
     refreshData(i);
-    checkBasketArray();
+    window.checkBasketArray();
   };
 })();
+
