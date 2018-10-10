@@ -6,7 +6,7 @@
   var cardTemplateElement = document.querySelector('#card').content.querySelector('.catalog__card');
 
   // функция для генерации дом-элементов карточек товара (каталог)
-  window.window.renderGoodsCard = function (item, id) {
+  window.renderGoodsCard = function (item, id) {
     cardTemplateElement.classList.remove('card--in-stock');
     cardTemplateElement.querySelector('.stars__rating').classList.remove('stars__rating--five');
 
@@ -50,20 +50,25 @@
     return goodsElement;
   };
 
-  // функция для первичной загрузки данных и рендера каталога
-  var onSuccessLoadData = function (data) {
-    window.cards = data;
+  window.renderCatalog = function (array) {
     var emptyElement = document.createDocumentFragment();
 
-    for (var i = 0; i < window.cards.length; i++) {
-      var card = window.renderGoodsCard(window.cards[i], i);
-      window.cards[i].id = i;
-      window.cards[i].dom = card;
+    for (var i = 0; i < array.length; i++) {
+      var card = window.renderGoodsCard(array[i], array[i].id);
+      array[i].id = i;
+      array[i].dom = card;
       emptyElement.appendChild(card);
     }
+
     catalogCardsElement.classList.remove('catalog__cards--load');
     catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');
     catalogCardsElement.appendChild(emptyElement);
+  };
+
+  // функция для первичной загрузки данных и рендера каталога
+  var onSuccessLoadData = function (data) {
+    window.cards = data;
+    window.renderCatalog(window.cards);
     window.resetRangeFiltersValue();
   };
 
