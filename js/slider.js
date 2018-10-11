@@ -1,8 +1,7 @@
 'use strict';
 // модуль для работы с фильтром
 (function () {
-  var PRICE_MIN = 0;
-  var PRICE_MAX = 90;
+
   var SLIDER_WIDTH = 10;
 
   var filtersWrapper = document.querySelector('.catalog__sidebar');
@@ -13,11 +12,13 @@
   var rangePriceMinElement = filtersWrapper.querySelector('.range__price--min');
   var rangePriceMaxElement = filtersWrapper.querySelector('.range__price--max');
   var rangeWidth = rangeElement.clientWidth;
+  var minPrice = window.currentFilters.minPrice;
+  var maxPrice = window.currentFilters.maxPrice;
 
 
   var updateRangePrice = function (coordX) {
     var currentPosition = coordX * 100 / rangeWidth;
-    return ((PRICE_MAX - PRICE_MIN) * currentPosition / 100 + PRICE_MIN).toFixed(0);
+    return ((maxPrice - minPrice) * currentPosition / 100 + minPrice).toFixed(0);
   };
 
   var onSliderMouseDown = function (evt) {
@@ -41,8 +42,12 @@
         rangeLineElement.style.right = rangeWidth - currentPinPosition + 'px';
         rangePriceMaxElement.textContent = updateRangePrice(currentPinPosition);
         window.currentFilters.maxPrice = updateRangePrice(currentPinPosition);
+
         // console.log(window.currentFilters.maxPrice);
       }
+
+      window.debounce(window.refreshCatalog());
+
     };
 
     var onSliderMouseUp = function () {
@@ -59,7 +64,7 @@
 
   window.resetRangeFiltersValue = function () {
     rangeLeftPinElement.style.left = 0 + 'px';
-    rangeRightPinElement.style.right = 0 + 'px';
+    rangeRightPinElement.style.left = rangeWidth - SLIDER_WIDTH + 'px';
     rangeLineElement.style.left = 0;
     rangeLineElement.style.right = 0;
     rangePriceMinElement.textContent = updateRangePrice(rangeLeftPinElement.offsetLeft);

@@ -30,15 +30,15 @@
   };
 
   // Функция для пересчета товаров, суммы и шапки корзины
-  var checkBasketArray = function () {
-    if (basketObjArray.length === 0) {
+  window.checkBasketArray = function () {
+    if (window.basketObjArray.length === 0) {
       basketCardsElement.classList.add('goods__cards--empty');
       basketEmptyElement.classList.remove('visually-hidden');
       basketHeaderElement.textContent = 'В корзине ничего нет';
     } else {
-      var basketTotalCount = basketObjArray.length;
+      var basketTotalCount = window.basketObjArray.length;
       var basketTotalPrice = 0;
-      basketObjArray.forEach(function (element) {
+      window.basketObjArray.forEach(function (element) {
         basketTotalPrice = basketTotalPrice + (element.price * element.orderedAmount);
       });
 
