@@ -138,7 +138,6 @@
   orderForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
     if (orderForm.checkValidity()) {
-
       window.upload(new FormData(orderForm), window.showSuccessPopup, window.showErrorPopup);
       orderForm.reset();
       paymentCardStatusElement.textContent = 'Не определен';
@@ -146,6 +145,9 @@
       togglePayment();
       deliveryStoreBtnElement.checked = true;
       toggleDelivery();
+      window.basketObjArray = [];
+      window.clearBasketGoods();
+      window.checkBasketArray();
     }
   });
 
