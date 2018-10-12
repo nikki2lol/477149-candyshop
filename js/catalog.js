@@ -32,15 +32,17 @@
   };
 
   var refreshClasses = function (id) {
-    var renderedCard = catalogCardsElement.querySelector('[id="' + id + '"]');
-    var renderedCardObject = getGoodsItem(id, window.catalogObjArray);
-    renderedCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
-    renderedCard.classList.add(checkAmountClasses(renderedCardObject));
+    var renderedCard = catalogCardsElement.querySelector('[data-id="' + id + '"]');
+
+    if (renderedCard) {
+      var renderedCardObject = getGoodsItem(id, window.catalogObjArray);
+      renderedCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
+      renderedCard.classList.add(checkAmountClasses(renderedCardObject));
+    }
   };
 
-  var onGoodsElementClick = function (evt) {
-    var clickedCard = event.currentTarget;
-    var id = +clickedCard.getAttribute('id');
+  var onGoodsElementClick = function (evt, id) {
+    var clickedCard = evt.currentTarget;
     var favoriteButton = clickedCard.querySelector('.card__btn-favorite');
 
     // объект соответственно этой карточке
@@ -64,56 +66,87 @@
           catalogBasketElement.appendChild(createBasketGoods(clickedCardInOrder));
         }
         // вынесу повторящуюся часть из условия
-        clickedCardInOrder.orderedAmount += 1;
-        cardInCatalog.amount = cardInCatalog.amount - 1;
-        catalogBasketElement.querySelector('[id="' + id + '"]').querySelector('.card-order__count').value = clickedCardInOrder.orderedAmount;
+        changeValue(1, clickedCard, id);
+        // clickedCardInOrder.orderedAmount += 1;
+        // cardInCatalog.amount = cardInCatalog.amount - 1;
+        // catalogBasketElement.querySelector('[id="' + id + '"]').querySelector('.card-order__count').value = clickedCardInOrder.orderedAmount;
       }
-      window.checkBasketArray();
-      refreshClasses(id);
+      // window.checkBasketArray();
+      // refreshClasses(id);
     }
   };
 
-  var onBasketGoodsClick = function (evt) {
+  var onBasketGoodsClick = function (evt, id) {
     var clickedCard = evt.currentTarget;
-    // создам дополнительные переменные для сокращения кода + ориентира внутри этой функции
-    var catalogArray = window.catalogObjArray;
-    var basketArray = window.basketObjArray;
-    var id = +clickedCard.getAttribute('id');
-    // и найду объекты этой карточки в массиве объектов каталога/корзины
-    var clickedCardInCatalog = getGoodsItem(id, catalogArray);
-    var clickedCardInBasket = getGoodsItem(id, basketArray);
-    // index для того чтобы его вырезать потом из корзины
+    // // создам дополнительные переменные для сокращения кода + ориентира внутри этой функции
+    // var catalogArray = window.catalogObjArray;
+    // var basketArray = window.basketObjArray;
+    // var id = +clickedCard.getAttribute('id');
+    // // и найду объекты этой карточки в массиве объектов каталога/корзины
+    // var clickedCardInCatalog = getGoodsItem(id, catalogArray);
+    // var clickedCardInBasket = getGoodsItem(id, basketArray);
+    // // index для того чтобы его вырезать потом из корзины
     var buttonDecrease = clickedCard.querySelector('.card-order__btn--decrease');
     var buttonIncrease = clickedCard.querySelector('.card-order__btn--increase');
     var buttonClose = clickedCard.querySelector('.card-order__close');
-    var countInput = clickedCard.querySelector('.card-order__count');
 
     if (evt.target === buttonDecrease) {
       evt.preventDefault();
-      clickedCardInCatalog.amount += 1;
-      clickedCardInBasket.orderedAmount = clickedCardInBasket.orderedAmount - 1;
+      changeValue(-1, clickedCard, id);
+      // clickedCardInCatalog.amount += 1;
+      // clickedCardInBasket.orderedAmount = clickedCardInBasket.orderedAmount - 1;
+      // changeValue(1, )
 
-      if (clickedCardInBasket.orderedAmount === 0) {
-        basketCardsElement.removeChild(clickedCard);
-        basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
-      } else {
-        countInput.value = clickedCardInBasket.orderedAmount;
-      }
+      // if (clickedCardInBasket.orderedAmount === 0) {
+      //   basketCardsElement.removeChild(clickedCard);
+      //   basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
+      // } else {
+      //   countInput.value = clickedCardInBasket.orderedAmount;
+      // }
     }
 
-    if (evt.target === buttonIncrease && clickedCardInCatalog.amount > 0) {
+    if (evt.target === buttonIncrease) {
       evt.preventDefault();
-      clickedCardInCatalog.amount = clickedCardInCatalog.amount - 1;
-      clickedCardInBasket.orderedAmount += 1;
-      countInput.value = clickedCardInBasket.orderedAmount;
+      changeValue(1, clickedCard, id);
+      // clickedCardInCatalog.amount = clickedCardInCatalog.amount - 1;
+      // clickedCardInBasket.orderedAmount += 1;
+      // countInput.value = clickedCardInBasket.orderedAmount;
     }
 
     if (evt.target === buttonClose) {
       evt.preventDefault();
-      clickedCardInCatalog.amount += clickedCardInBasket.orderedAmount;
-      basketCardsElement.removeChild(clickedCard);
-      basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
+      // changeValue(-clickedCardInBasket.orderedAmount, clickedCard, id);
+      changeValue(-getGoodsItem(id, window.basketObjArray).orderedAmount, clickedCard, id);
+      // clickedCardInCatalog.amount += clickedCardInBasket.orderedAmount;
+      // basketCardsElement.removeChild(clickedCard);
+      // basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
     }
+
+  };
+
+  var changeValue = function (delta, card, id) {
+    // создам дополнительные переменные для сокращения кода + ориентира внутри этой функции
+    var catalogArray = window.catalogObjArray;
+    var basketArray = window.basketObjArray;
+    // и найду объекты этой карточки в массиве объектов каталога/корзины
+    var clickedCardInCatalog = getGoodsItem(id, catalogArray);
+    var clickedCardInBasket = getGoodsItem(id, basketArray);
+    // index для того чтобы его вырезать потом из корзины
+
+    if (clickedCardInCatalog.amount > 0 || clickedCardInCatalog.amount === 0 && delta < 0) {
+      clickedCardInCatalog.amount = clickedCardInCatalog.amount - delta;
+      clickedCardInBasket.orderedAmount += delta;
+      catalogBasketElement.querySelector('[data-index="' + id + '"]').querySelector('.card-order__count').value = clickedCardInBasket.orderedAmount;
+    }
+
+    // для удаления
+    if (clickedCardInBasket.orderedAmount === 0) {
+      clickedCardInCatalog.amount = clickedCardInBasket.amount;
+      clickedCardInBasket.orderedAmount = 0;
+      card.parentNode.removeChild(card);
+      window.basketObjArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
+    }
+
     window.checkBasketArray();
     refreshClasses(id);
   };
@@ -133,9 +166,14 @@
     goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
     goodsElement.querySelector('.card__characteristic').textContent = item.nutritionFacts.sugar ? 'С сахаром. ' + item.nutritionFacts.energy + ' ккал.' : 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
     goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
-    goodsElement.setAttribute('id', item.id);
+    goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
+      goodsElement.querySelector('.card__composition').classList.toggle('card__composition--hidden');
+    });
+    goodsElement.setAttribute('data-id', item.id);
 
-    goodsElement.addEventListener('click', onGoodsElementClick);
+    goodsElement.addEventListener('click', function (evt) {
+      onGoodsElementClick(evt, item.id);
+    });
 
     var favoriteButton = goodsElement.querySelector('.card__btn-favorite');
     favoriteButton.classList.toggle('card__btn-favorite--selected', item.isFavorite);
@@ -150,8 +188,10 @@
     goodsElement.querySelector('.card-order__img').src = 'img/cards/' + obj.picture;
     goodsElement.querySelector('.card-order__price-value').textContent = obj.price;
     goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
-    goodsElement.setAttribute('id', obj.id);
-    goodsElement.addEventListener('click', onBasketGoodsClick);
+    goodsElement.setAttribute('data-index', obj.id);
+    goodsElement.addEventListener('click', function (evt) {
+      onBasketGoodsClick(evt, obj.id);
+    });
 
     return goodsElement;
   };
