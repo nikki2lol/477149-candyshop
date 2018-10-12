@@ -44,10 +44,9 @@
       window.currentFilters.foodProperty.push(typeOfNutrition[elem.value]);
     });
     window.currentFilters.isFavorite = filtersWrapper.querySelector('#filter-favorite').checked;
-    window.currentFilters.isAvailable = filtersWrapper.querySelector('#filter-availability').checked;
+    window.currentFilters.amount = filtersWrapper.querySelector('#filter-availability').checked;
     window.currentFilters.currentSort = filtersWrapper.querySelector('input[name="sort"]:checked').value;
   };
-
 
   // функция сравнения популярности
   var comparePopularity = function (a, b) {
@@ -56,28 +55,12 @@
 
   // функция сравнения цен (от большего к меньшему)
   var compareExpensivePrices = function (a, b) {
-    // return b.price > a.price;
-
-    if (b.price > a.price) {
-      return 1;
-    } else if (b.price < a.price) {
-      return -1;
-    } else {
-      return 0;
-    }
+    return b.price - a.price;
   };
 
   // функция сравнения цен (от большего к меньшему), хотя можно было просто параметры переставить местами при ее вызове, но да ладно
   var compareCheapPrices = function (a, b) {
-    // return a.price > b.price;
-
-    if (a.price > b.price) {
-      return 1;
-    } else if (a.price < b.price) {
-      return -1;
-    } else {
-      return 0;
-    }
+    return a.price - b.price;
   };
 
   // функция сравнения рейтинга
@@ -130,7 +113,6 @@
       foodTypeMatch = checkType(elem);
     } else {
       foodTypeMatch = true;
-      // присваиваю true, чтобы на финальной проверке этот фильтр не мешал другим
     }
 
     if (window.currentFilters.foodProperty.length > 0) {
@@ -147,8 +129,8 @@
       return elem.isFavorite;
     }
 
-    if (window.currentFilters.isAvailable) {
-      return elem.isAvailable > 0;
+    if (window.currentFilters.amount) {
+      return elem.amount > 0;
     }
 
     return foodTypeMatch && foodPropertyMatch && priceMatch;
@@ -158,7 +140,6 @@
   // и здесь выношу в глобальную область видимости функцию, которая принимает в аргумент массив, применяет нужные фильтры и возращает измененный массив
   var applyFilters = function (array) {
     makeFiltersGreatAgain();
-    // console.log(array.filter(filterCatalogGoods).sort(selectCurrentSort));
     return array.filter(filterCatalogGoods).sort(selectCurrentSort);
   };
 
@@ -192,25 +173,19 @@
       });
     }
 
-    window.debounce(window.refreshCatalog());
+    window.debounce(window.generateNewOnFilterChanges());
   };
 
-  window.findMaxAndMinPriceValue = function () {
-    var priceArray = [];
-    for (var i = 0; i < window.cards.length; i++) {
-      priceArray.push(window.cards[i].price);
-    }
-    window.currentFilters.maxPrice = Math.max.apply(null, priceArray);
-    window.currentFilters.minPrice = Math.min.apply(null, priceArray);
-  };
-
-  window.refreshCatalog = function () {
-    var newArray = applyFilters(window.cards);
-    // console.log(newArray);
+  var makeNewCatalog = function (array) {
     deleteCardsFromCatalog();
-    window.renderCatalog(newArray);
+    catalogCardsElement.appendChild(window.renderCatalog(array));
+  };
 
-    if (newArray.length === 0) {
+  window.generateNewOnFilterChanges = function () {
+    window.filteredCards = applyFilters(window.cards);
+    makeNewCatalog(window.filteredCards);
+
+    if (window.filteredCards.length === 0) {
       showNoResultBlock();
     }
   };
@@ -222,15 +197,14 @@
     minPrice: 0,
     maxPrice: 90,
     isFavorite: false,
-    isAvailable: false,
+    amount: false,
     currentSort: null
   };
 
   resetFiltersElement.addEventListener('click', function (evt) {
     evt.preventDefault();
     filtersForm.reset();
-    window.findMaxAndMinPriceValue();
-    window.debounce(window.refreshCatalog());
+    window.debounce(window.generateNewOnFilterChanges());
     window.debounce(window.resetRangeFiltersValue());
   });
 

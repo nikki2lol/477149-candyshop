@@ -31,10 +31,9 @@
       var currentPinPosition = startCoordX - (evt.clientX - event.clientX);
       if (currentPin === rangeLeftPinElement && currentPinPosition < rangeRightPinElement.offsetLeft && currentPinPosition >= 0) {
         currentPin.style.left = currentPinPosition + 'px';
-        rangeLineElement.style.left = currentPinPosition + SLIDER_WIDTH / 2 + 'px';
+        rangeLineElement.style.left = currentPinPosition + 'px';
         rangePriceMinElement.textContent = updateRangePrice(currentPinPosition);
         window.currentFilters.minPrice = updateRangePrice(currentPinPosition);
-        // console.log(window.currentFilters.minPrice);
       }
 
       if (currentPin === rangeRightPinElement && currentPinPosition > rangeLeftPinElement.offsetLeft && currentPinPosition <= rangeWidth) {
@@ -42,11 +41,9 @@
         rangeLineElement.style.right = rangeWidth - currentPinPosition + 'px';
         rangePriceMaxElement.textContent = updateRangePrice(currentPinPosition);
         window.currentFilters.maxPrice = updateRangePrice(currentPinPosition);
-
-        // console.log(window.currentFilters.maxPrice);
       }
 
-      window.debounce(window.refreshCatalog());
+      window.debounce(window.generateNewOnFilterChanges());
 
     };
 
