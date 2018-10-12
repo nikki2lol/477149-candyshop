@@ -10,6 +10,23 @@
   var filterFavoriteInputElement = filtersWrapper.querySelector('#filter-favorite');
   var filterAvailabilityInputElement = filtersWrapper.querySelector('#filter-availability');
 
+  // counters
+  var countElements = [].slice.call(document.querySelectorAll('.input-btn__item-count'));
+
+  // создам объект для счетчиков
+  var countsObject = {
+    iceCream: 0,
+    soda: 0,
+    gum: 0,
+    marmalade: 0,
+    marshmallows: 0,
+    sugarFree: 0,
+    vegetarian: 0,
+    gluten: 0,
+    isFavorite: 0,
+    isAvailable: 0
+  };
+
   // словарь для сопоставления value типа мороженого и его брата в объекте
   var typeOfKind = {
     'Мороженое': 'icecream',
@@ -181,6 +198,69 @@
     catalogCardsElement.appendChild(window.renderCatalog(array));
   };
 
+  window.displayCounters = function () {
+    window.catalogObjArray.forEach(function (element) {
+      if (element.kind === 'Мороженое') {
+        countsObject.iceCream += 1;
+      }
+
+      if (element.kind === 'Газировка') {
+        countsObject.soda += 1;
+      }
+
+      if (element.kind === 'Жевательная резинка') {
+        countsObject.gum += 1;
+      }
+
+      if (element.kind === 'Мармелад') {
+        countsObject.marmalade += 1;
+      }
+
+      if (element.kind === 'Зефир') {
+        countsObject.marshmallows += 1;
+      }
+
+      if (element.nutritionFacts.sugar) {
+        countsObject.sugarFree += 1;
+      }
+
+      if (element.nutritionFacts.vegetarian) {
+        countsObject.vegetarian += 1;
+      }
+
+      if (element.nutritionFacts.gluten) {
+        countsObject.gluten += 1;
+      }
+
+      if (element.isFavorite) {
+        countsObject.isFavorite += 1;
+      }
+
+      if (element.amount > 0) {
+        countsObject.isAvailable += 1;
+      }
+
+    });
+
+    countElements.forEach(function (elem) {
+      elem.textContent = '(' + countsObject.iceCream + ')';
+    });
+    countElements[0].textContent = '(' + countsObject.iceCream + ')';
+    countElements[1].textContent = '(' + countsObject.soda + ')';
+    countElements[2].textContent = '(' + countsObject.gum + ')';
+    countElements[3].textContent = '(' + countsObject.marmalade + ')';
+    countElements[4].textContent = '(' + countsObject.marshmallows + ')';
+    countElements[5].textContent = '(' + countsObject.sugarFree + ')';
+    countElements[6].textContent = '(' + countsObject.vegetarian + ')';
+    countElements[7].textContent = '(' + countsObject.gluten + ')';
+    countElements[8].textContent = '(' + countsObject.isFavorite + ')';
+    countElements[9].textContent = '(' + countsObject.isAvailable + ')';
+
+    // потому что все подходят изначально под ценовой диапозон и это значение не должно меняться, воообще непонятная логика зачем этот счетчик для цены
+
+    document.querySelector('.range__count').textContent = '(' + window.catalogObjArray.length + ')';
+  };
+
   window.generateNewOnFilterChanges = function () {
     window.filteredCards = applyFilters(window.catalogObjArray);
     makeNewCatalog(window.filteredCards);
@@ -188,6 +268,15 @@
     if (window.filteredCards.length === 0) {
       showNoResultBlock();
     }
+  };
+
+  window.setMinMaxPrices = function () {
+    var sortForPrice = window.catalogObjArray.sort(function (a, b) {
+      return a.price - b.price;
+    });
+
+    window.currentFilters.minPrice = sortForPrice[0].price;
+    window.currentFilters.maxPrice = sortForPrice[sortForPrice.length - 1].price;
   };
 
   // объект для хранения данных о текущих примененных фильтрах
@@ -204,8 +293,9 @@
   resetFiltersElement.addEventListener('click', function (evt) {
     evt.preventDefault();
     filtersForm.reset();
-    window.generateNewOnFilterChanges();
+    window.setMinMaxPrices();
     window.resetRangeFiltersValue();
+    window.generateNewOnFilterChanges();
   });
 
   filtersForm.addEventListener('change', onFormChange);
