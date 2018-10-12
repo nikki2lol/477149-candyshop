@@ -39,7 +39,8 @@
     xhr.addEventListener('timeout', function () {
       errorCallback('Запрос не успел выполниться за ' + TIMEOUT_TIME + 'мс');
     });
-    xhr.timeout = 10000;
+
+    xhr.timeout = TIMEOUT_TIME;
   };
 
   window.load = function (onSuccess, onError) {
@@ -59,13 +60,11 @@
   window.showErrorPopup = function () {
     var succesPopupElement = document.querySelector('#modal-error');
     var btnClose = succesPopupElement.querySelector('.modal__close');
-    // var errorNumberElement = succesPopupElement.querySelector('.moda__message--error');
 
     var onClickCloseButton = function () {
       succesPopupElement.classList.add('modal--hidden');
     };
 
-    // errorNumberElement.textContent = 'Код ошибки: ' + xhr.status + '.';
     succesPopupElement.classList.remove('modal--hidden');
     btnClose.addEventListener('click', onClickCloseButton);
   };
