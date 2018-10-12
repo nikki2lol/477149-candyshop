@@ -169,7 +169,7 @@
     goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
       goodsElement.querySelector('.card__composition').classList.toggle('card__composition--hidden');
     });
-    goodsElement.setAttribute('data-id', item.id);
+    goodsElement.dataset.id = item.id;
 
     goodsElement.addEventListener('click', function (evt) {
       onGoodsElementClick(evt, item.id);
@@ -188,7 +188,7 @@
     goodsElement.querySelector('.card-order__img').src = 'img/cards/' + obj.picture;
     goodsElement.querySelector('.card-order__price-value').textContent = obj.price;
     goodsElement.querySelector('.card-order__count').value = obj.orderedAmount;
-    goodsElement.setAttribute('data-index', obj.id);
+    goodsElement.dataset.index = obj.id;
     goodsElement.addEventListener('click', function (evt) {
       onBasketGoodsClick(evt, obj.id);
     });
