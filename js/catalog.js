@@ -2,6 +2,7 @@
 // модуль, который работает с карточками товаров и корзиной
 (function () {
   var STARS_RATING = ['stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five'];
+  var IN_STOCK_AMOUNT = 5;
   var catalogBasketElement = document.querySelector('.goods__cards');
   var cardTemplateElement = document.querySelector('#card').content.querySelector('.catalog__card');
   var catalogCardsElement = document.querySelector('.catalog__cards');
@@ -12,7 +13,7 @@
 
   var checkAmountClasses = function (elem) {
     var amountClass;
-    if (elem.amount > 5) {
+    if (elem.amount > IN_STOCK_AMOUNT) {
       amountClass = 'card--in-stock';
     } else if (elem.amount >= 1 && elem.amount <= 5) {
       amountClass = 'card--little';
@@ -32,29 +33,29 @@
   };
 
   var refreshClasses = function (id) {
-    var renderedCard = catalogCardsElement.querySelector('[data-id="' + id + '"]');
+    var renderedCardElement = catalogCardsElement.querySelector('[data-id="' + id + '"]');
 
-    if (renderedCard) {
+    if (renderedCardElement) {
       var renderedCardObject = getGoodsItem(id, window.catalogObjArray);
-      renderedCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
-      renderedCard.classList.add(checkAmountClasses(renderedCardObject));
+      renderedCardElement.classList.remove('card--in-stock', 'card--little', 'card--soon');
+      renderedCardElement.classList.add(checkAmountClasses(renderedCardObject));
     }
   };
 
   var onGoodsElementClick = function (evt, id) {
-    var clickedCard = evt.currentTarget;
-    var favoriteButton = clickedCard.querySelector('.card__btn-favorite');
+    var clickedCardElement = evt.currentTarget;
+    var favoriteButtonElement = clickedCardElement.querySelector('.card__btn-favorite');
 
     // объект соответственно этой карточке
     var cardInCatalog = getGoodsItem(id, window.catalogObjArray);
 
-    if (evt.target === favoriteButton) {
+    if (evt.target === favoriteButtonElement) {
       evt.preventDefault();
-      favoriteButton.classList.toggle('card__btn-favorite--selected');
+      favoriteButtonElement.classList.toggle('card__btn-favorite--selected');
       cardInCatalog.isFavorite = !cardInCatalog.isFavorite;
     }
 
-    if (evt.target === clickedCard.querySelector('.card__btn')) {
+    if (evt.target === clickedCardElement.querySelector('.card__btn')) {
       evt.preventDefault();
       if (cardInCatalog.amount > 0) {
         // поиск его в корзине
@@ -65,74 +66,40 @@
           window.basketObjArray.push(clickedCardInOrder);
           catalogBasketElement.appendChild(createBasketGoods(clickedCardInOrder));
         }
-        // вынесу повторящуюся часть из условия
-        changeValue(1, clickedCard, id);
-        // clickedCardInOrder.orderedAmount += 1;
-        // cardInCatalog.amount = cardInCatalog.amount - 1;
-        // catalogBasketElement.querySelector('[id="' + id + '"]').querySelector('.card-order__count').value = clickedCardInOrder.orderedAmount;
+        changeValue(1, clickedCardElement, id);
       }
-      // window.checkBasketArray();
-      // refreshClasses(id);
     }
   };
 
   var onBasketGoodsClick = function (evt, id) {
-    var clickedCard = evt.currentTarget;
-    // // создам дополнительные переменные для сокращения кода + ориентира внутри этой функции
-    // var catalogArray = window.catalogObjArray;
-    // var basketArray = window.basketObjArray;
-    // var id = +clickedCard.getAttribute('id');
-    // // и найду объекты этой карточки в массиве объектов каталога/корзины
-    // var clickedCardInCatalog = getGoodsItem(id, catalogArray);
-    // var clickedCardInBasket = getGoodsItem(id, basketArray);
-    // // index для того чтобы его вырезать потом из корзины
-    var buttonDecrease = clickedCard.querySelector('.card-order__btn--decrease');
-    var buttonIncrease = clickedCard.querySelector('.card-order__btn--increase');
-    var buttonClose = clickedCard.querySelector('.card-order__close');
+    var clickedCardElement = evt.currentTarget;
 
-    if (evt.target === buttonDecrease) {
+    var buttonDecreaseElement = clickedCardElement.querySelector('.card-order__btn--decrease');
+    var buttonIncreaseElement = clickedCardElement.querySelector('.card-order__btn--increase');
+    var buttonCloseElement = clickedCardElement.querySelector('.card-order__close');
+
+    if (evt.target === buttonDecreaseElement) {
       evt.preventDefault();
-      changeValue(-1, clickedCard, id);
-      // clickedCardInCatalog.amount += 1;
-      // clickedCardInBasket.orderedAmount = clickedCardInBasket.orderedAmount - 1;
-      // changeValue(1, )
-
-      // if (clickedCardInBasket.orderedAmount === 0) {
-      //   basketCardsElement.removeChild(clickedCard);
-      //   basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
-      // } else {
-      //   countInput.value = clickedCardInBasket.orderedAmount;
-      // }
+      changeValue(-1, clickedCardElement, id);
     }
 
-    if (evt.target === buttonIncrease) {
+    if (evt.target === buttonIncreaseElement) {
       evt.preventDefault();
-      changeValue(1, clickedCard, id);
-      // clickedCardInCatalog.amount = clickedCardInCatalog.amount - 1;
-      // clickedCardInBasket.orderedAmount += 1;
-      // countInput.value = clickedCardInBasket.orderedAmount;
+      changeValue(1, clickedCardElement, id);
     }
 
-    if (evt.target === buttonClose) {
+    if (evt.target === buttonCloseElement) {
       evt.preventDefault();
-      // changeValue(-clickedCardInBasket.orderedAmount, clickedCard, id);
-      changeValue(-getGoodsItem(id, window.basketObjArray).orderedAmount, clickedCard, id);
-      // clickedCardInCatalog.amount += clickedCardInBasket.orderedAmount;
-      // basketCardsElement.removeChild(clickedCard);
-      // basketArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
+      changeValue(-getGoodsItem(id, window.basketObjArray).orderedAmount, clickedCardElement, id);
     }
 
   };
 
   var changeValue = function (delta, card, id) {
-    // создам дополнительные переменные для сокращения кода + ориентира внутри этой функции
-    var catalogArray = window.catalogObjArray;
-    var basketArray = window.basketObjArray;
-    // и найду объекты этой карточки в массиве объектов каталога/корзины
-    var clickedCardInCatalog = getGoodsItem(id, catalogArray);
-    var clickedCardInBasket = getGoodsItem(id, basketArray);
-    // index для того чтобы его вырезать потом из корзины
-
+    var catalogGoods = window.catalogObjArray;
+    var basketGoods = window.basketObjArray;
+    var clickedCardInCatalog = getGoodsItem(id, catalogGoods);
+    var clickedCardInBasket = getGoodsItem(id, basketGoods);
     if (clickedCardInCatalog.amount > 0 || clickedCardInCatalog.amount === 0 && delta < 0) {
       clickedCardInCatalog.amount = clickedCardInCatalog.amount - delta;
       clickedCardInBasket.orderedAmount += delta;
@@ -144,7 +111,7 @@
       clickedCardInCatalog.amount = clickedCardInBasket.amount;
       clickedCardInBasket.orderedAmount = 0;
       card.parentNode.removeChild(card);
-      window.basketObjArray.splice(basketArray.indexOf(clickedCardInBasket), 1);
+      window.basketObjArray.splice(basketGoods.indexOf(clickedCardInBasket), 1);
     }
 
     window.checkBasketArray();
@@ -175,8 +142,8 @@
       onGoodsElementClick(evt, item.id);
     });
 
-    var favoriteButton = goodsElement.querySelector('.card__btn-favorite');
-    favoriteButton.classList.toggle('card__btn-favorite--selected', item.isFavorite);
+    var favoriteButtonElement = goodsElement.querySelector('.card__btn-favorite');
+    favoriteButtonElement.classList.toggle('card__btn-favorite--selected', item.isFavorite);
 
     return goodsElement;
   };
@@ -216,7 +183,7 @@
   };
 
   window.clearBasketGoods = function () {
-    var currentBasketArray = [].slice.call(basketCardsElement.querySelectorAll('.goods_card'));
+    var currentBasketArray = basketCardsElement.querySelectorAll('.goods_card');
     for (var j = 0; j < currentBasketArray.length; j++) {
       basketCardsElement.removeChild(currentBasketArray[j]);
     }
@@ -226,8 +193,8 @@
     var catalogElement = document.createDocumentFragment();
 
     for (var i = 0; i < data.length; i++) {
-      var card = renderGoodsCard(data[i]);
-      catalogElement.appendChild(card);
+      var cardElement = renderGoodsCard(data[i]);
+      catalogElement.appendChild(cardElement);
     }
 
     return catalogElement;

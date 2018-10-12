@@ -60,13 +60,11 @@
   window.showErrorPopup = function () {
     var succesPopupElement = document.querySelector('#modal-error');
     var btnClose = succesPopupElement.querySelector('.modal__close');
-    // var errorNumberElement = succesPopupElement.querySelector('.moda__message--error');
 
     var onClickCloseButton = function () {
       succesPopupElement.classList.add('modal--hidden');
     };
 
-    // errorNumberElement.textContent = 'Код ошибки: ' + xhr.status + '.';
     succesPopupElement.classList.remove('modal--hidden');
     btnClose.addEventListener('click', onClickCloseButton);
   };

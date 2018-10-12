@@ -7,7 +7,6 @@
 
   // функция для первичной загрузки данных и рендера каталога
   var onSuccessLoadData = function (data) {
-    // console.log(data);
     for (var i = 0; i < data.length; i++) {
       data[i].id = i;
       data[i].isFavorite = false;
@@ -31,7 +30,6 @@
 
     window.displayCounters();
   };
-
 
   window.load(onSuccessLoadData, window.showErrorPopup);
 })();

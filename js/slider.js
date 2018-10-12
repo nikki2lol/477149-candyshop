@@ -23,27 +23,27 @@
 
   var onSliderMouseDown = function (evt) {
     evt.preventDefault();
-    var currentPin = evt.target;
-    var startCoordX = currentPin.offsetLeft;
+    var currentPinElement = evt.target;
+    var startCoordX = currentPinElement.offsetLeft;
 
     var onSliderMouseMove = function (event) {
       event.preventDefault();
       var currentPinPosition = startCoordX - (evt.clientX - event.clientX);
-      if (currentPin === rangeLeftPinElement && currentPinPosition < rangeRightPinElement.offsetLeft && currentPinPosition >= 0) {
-        currentPin.style.left = currentPinPosition + 'px';
+      if (currentPinElement === rangeLeftPinElement && currentPinPosition < rangeRightPinElement.offsetLeft && currentPinPosition >= 0) {
+        currentPinElement.style.left = currentPinPosition + 'px';
         rangeLineElement.style.left = currentPinPosition + 'px';
         rangePriceMinElement.textContent = updateRangePrice(currentPinPosition);
         window.currentFilters.minPrice = updateRangePrice(currentPinPosition);
       }
 
-      if (currentPin === rangeRightPinElement && currentPinPosition > rangeLeftPinElement.offsetLeft && currentPinPosition <= rangeWidth) {
-        currentPin.style.left = currentPinPosition + 'px';
+      if (currentPinElement === rangeRightPinElement && currentPinPosition > rangeLeftPinElement.offsetLeft && currentPinPosition <= rangeWidth) {
+        currentPinElement.style.left = currentPinPosition + 'px';
         rangeLineElement.style.right = rangeWidth - currentPinPosition + 'px';
         rangePriceMaxElement.textContent = updateRangePrice(currentPinPosition);
         window.currentFilters.maxPrice = updateRangePrice(currentPinPosition);
       }
 
-      window.debounce(window.generateNewOnFilterChanges());
+      window.debounce(window.sortAndFilterCatalog());
 
     };
 
