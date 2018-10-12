@@ -3,11 +3,13 @@
 (function () {
   var STARS_RATING = ['stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five'];
   var catalogCardsElement = document.querySelector('.catalog__cards');
+  var catalogBasketElement = document.querySelector('.goods__cards');
   var cardTemplateElement = document.querySelector('#card').content.querySelector('.catalog__card');
+  window.catalogObjArray = [];
+  window.basketObjArray = [];
 
   // counters
   var countElements = [].slice.call(document.querySelectorAll('.input-btn__item-count'));
-  // var typeOfFilters = ['Мороженое', 'Газировка', 'Жевательная резинка', 'Мармелад', 'Зефир', 'sugar', 'vegetarian', 'gluten'];
 
   // создам объект для счетчиков
   var countsObject = {
@@ -24,7 +26,7 @@
   };
 
   var displayCounters = function () {
-    window.cards.forEach(function (element) {
+    window.catalogObjArray.forEach(function (element) {
       if (element.kind === 'Мороженое') {
         countsObject.iceCream += 1;
       }
@@ -83,7 +85,46 @@
 
     // потому что все подходят изначально под ценовой диапозон и это значение не должно меняться, воообще непонятная логика зачем этот счетчик для цены
 
-    document.querySelector('.range__count').textContent = '(' + window.cards.length + ')';
+    document.querySelector('.range__count').textContent = '(' + window.catalogObjArray.length + ')';
+  };
+
+  var onGoodsElementClick = function (evt) {
+    var clickedCard = event.currentTarget;
+    var id = +clickedCard.getAttribute('id');
+    // console.log(id);
+    // console.log(window.catalogObjArray, 'window.catalogObjArray');
+    var favoriteButton = clickedCard.querySelector('.card__btn-favorite');
+
+    // объект соответственно этой карточке
+    var cardInCatalog = window.getGoodsItem(id, window.catalogObjArray);
+
+    if (evt.target === favoriteButton) {
+      evt.preventDefault();
+      favoriteButton.classList.toggle('card__btn-favorite--selected');
+      cardInCatalog.isFavorite = !cardInCatalog.isFavorite;
+    }
+
+    if (evt.target === clickedCard.querySelector('.card__btn')) {
+      evt.preventDefault();
+      if (cardInCatalog.amount > 0) {
+        // поиск его в корзине
+        var clickedCardInOrder = window.getGoodsItem(id, window.basketObjArray);
+        // console.log(clickedCardInOrder);
+        if (clickedCardInOrder === undefined) {
+          clickedCardInOrder = Object.assign({}, cardInCatalog);
+          clickedCardInOrder.orderedAmount = 0;
+          window.basketObjArray.push(clickedCardInOrder);
+          catalogBasketElement.appendChild(window.createBasketGoods(clickedCardInOrder));
+        }
+        // вынесу повторящуюся часть из условия
+        clickedCardInOrder.orderedAmount += 1;
+        cardInCatalog.amount = cardInCatalog.amount - 1;
+        // console.log(catalogBasketElement.querySelector('[id="' + id + '"]'));
+        catalogBasketElement.querySelector('[id="' + id + '"]').querySelector('.card-order__count').value = clickedCardInOrder.orderedAmount;
+      }
+      window.checkBasketArray();
+      window.refreshClasses(id);
+    }
   };
 
   // функция для генерации дом-элементов карточек товара (каталог)
@@ -96,13 +137,10 @@
     var amountClass;
     if (item.amount > 5) {
       amountClass = 'card--in-stock';
-      // item.isAvailable = true;
     } else if (item.amount >= 1 && item.amount <= 5) {
       amountClass = 'card--little';
-      // item.isAvailable = true;
     } else {
       amountClass = 'card--soon';
-      // item.isAvailable = false;
     }
     goodsElement.classList.add(amountClass);
     goodsElement.querySelector('.card__title').textContent = item.name;
@@ -113,39 +151,45 @@
     goodsElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
     goodsElement.querySelector('.card__characteristic').textContent = item.nutritionFacts.sugar ? 'С сахаром. ' + item.nutritionFacts.energy + ' ккал.' : 'Без сахара. ' + item.nutritionFacts.energy + ' ккал.';
     goodsElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
-    goodsElement.dataset.index = item.id;
+    goodsElement.setAttribute('id', item.id);
 
-    goodsElement.querySelector('.card__btn').addEventListener('click', function (evt) {
-      evt.preventDefault();
-      window.onAddButtonClick(item.id);
-    });
+    goodsElement.addEventListener('click', onGoodsElementClick);
 
-    goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
-      goodsElement.querySelector('.card__composition').classList.toggle('card__composition--hidden');
-    });
+    // goodsElement.querySelector('.card__btn').addEventListener('click', function (evt) {
+    //   evt.preventDefault();
+    //   var goodsElementInCatalog = window.catalogObjArray[item.id];
+    //   if (window.catalogObjArray[item.id].amount >= 1) {
+    //
+    //     var foundCard = window.getGoodsItem(item.id, window.catalogObjArray);
+    //
+    //     if (foundCard === undefined) {
+    //       foundCard = Object.assign({}, goodsElementInCatalog);
+    //       foundCard.orderedAmount = 0;
+    //       window.basketObjArray.push(foundCard);
+    //       window.createBasketGoods(foundCard);
+    //     }
+    //
+    //     window.changeValue(1, goodsElement);
+    //
+    //   }
+    // });
 
-    var btnFavourite = goodsElement.querySelector('.card__btn-favorite');
-    btnFavourite.classList.toggle('card__btn-favourite--selected', item.isFavorite);
+    // goodsElement.querySelector('.card__btn-composition').addEventListener('click', function () {
+    //   goodsElement.querySelector('.card__composition').classList.toggle('card__composition--hidden');
+    // });
 
-    btnFavourite.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      btnFavourite.classList.toggle('card__btn-favorite--selected');
-
-      if (item.isFavorite) {
-        item.isFavorite = false;
-      } else {
-        item.isFavorite = true;
-      }
-    });
+    var favoriteButton = goodsElement.querySelector('.card__btn-favorite');
+    favoriteButton.classList.toggle('card__btn-favorite--selected', item.isFavorite);
 
     return goodsElement;
   };
 
   // функция для первичной загрузки данных и рендера каталога
   var onSuccessLoadData = function (data) {
+    // console.log(data);
     for (var i = 0; i < data.length; i++) {
       data[i].id = i;
-      data[i].isFavourite = false;
+      data[i].isFavorite = false;
     }
 
     // для первоначального фильтра
@@ -153,26 +197,49 @@
       return b.rating.number - a.rating.number;
     });
 
-    window.cards = data.slice();
+    window.catalogObjArray = data.slice();
     window.resetRangeFiltersValue();
 
-    catalogCardsElement.appendChild(window.renderCatalog(data));
-    catalogCardsElement.classList.remove('catalog__cards--load');
-    catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');
+    // catalogCardsElement.appendChild(window.renderCatalog(window.catalogObjArray));
 
-    var sortForPrice = window.cards.sort(function (a, b) {
+    var catalogFragment = window.renderCatalog(data);
+    catalogCardsElement.append(catalogFragment);
+
+    var sortForPrice = window.catalogObjArray.sort(function (a, b) {
       return a.price - b.price;
     });
 
     window.currentFilters.minPrice = sortForPrice[0].price;
     window.currentFilters.maxPrice = sortForPrice[sortForPrice.length - 1].price;
+
+    catalogCardsElement.classList.remove('catalog__cards--load');
+    catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');
+
     displayCounters();
+  };
+
+  window.refreshClasses = function (id) {
+    var renderedCard = catalogCardsElement.querySelector('[id="' + id + '"]');
+    var renderedCardObject = window.getGoodsItem(id, window.catalogObjArray);
+
+    var amountClass;
+    renderedCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
+    if (renderedCardObject.amount > 5) {
+      amountClass = 'card--in-stock';
+    } else if (renderedCardObject.amount >= 1 && renderedCardObject.amount <= 5) {
+      amountClass = 'card--little';
+    } else {
+      amountClass = 'card--soon';
+    }
+    renderedCard.classList.add(amountClass);
   };
 
   window.renderCatalog = function (data) {
     var catalogElement = document.createDocumentFragment();
+
     for (var i = 0; i < data.length; i++) {
       var card = renderGoodsCard(data[i]);
+      // console.log(data[i]);
       catalogElement.appendChild(card);
     }
 

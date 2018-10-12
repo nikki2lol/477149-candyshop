@@ -182,7 +182,7 @@
   };
 
   window.generateNewOnFilterChanges = function () {
-    window.filteredCards = applyFilters(window.cards);
+    window.filteredCards = applyFilters(window.catalogObjArray);
     makeNewCatalog(window.filteredCards);
 
     if (window.filteredCards.length === 0) {
@@ -204,8 +204,8 @@
   resetFiltersElement.addEventListener('click', function (evt) {
     evt.preventDefault();
     filtersForm.reset();
-    window.debounce(window.generateNewOnFilterChanges());
-    window.debounce(window.resetRangeFiltersValue());
+    window.generateNewOnFilterChanges();
+    window.resetRangeFiltersValue();
   });
 
   filtersForm.addEventListener('change', onFormChange);
