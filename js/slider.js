@@ -42,7 +42,7 @@
         window.filters.currentFilters.maxPrice = updateRangePrice(currentPinPosition);
       }
 
-      window.debounce.debounce(window.filters.sortAndFilterCatalog());
+      window.utils.debounce(window.filters.sortAndFilterCatalog());
 
     };
 

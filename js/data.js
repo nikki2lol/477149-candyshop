@@ -23,7 +23,7 @@
 
     window.filters.setMinMaxPrices();
 
-    window.order.disableInputs(true);
+    window.utils.disableOrderForm(true);
 
     catalogCardsElement.classList.remove('catalog__cards--load');
     catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');

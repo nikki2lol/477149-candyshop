@@ -181,7 +181,7 @@
         basketHeaderElement.textContent = 'В Вашей корзине ' + basketTotalCount + ' товаров на сумму ' + basketTotalPrice + ' Р';
       }
 
-      window.order.disableInputs(window.data.basketObjArray.length === 0);
+      window.utils.disableOrderForm(window.data.basketObjArray.length === 0);
     },
 
     clearBasketGoods: function () {

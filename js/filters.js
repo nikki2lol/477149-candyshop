@@ -181,7 +181,7 @@
       });
     }
 
-    window.debounce.debounce(window.filters.sortAndFilterCatalog());
+    window.utils.debounce(window.filters.sortAndFilterCatalog());
   };
 
   var makeNewCatalog = function (array) {

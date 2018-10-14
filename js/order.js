@@ -4,7 +4,6 @@
   var MIN_NUMBER_VALUE_KEYCODE = 48;
   var MAX_NUMBER_VALUE_KEYCODE = 57;
   var orderFormElement = document.querySelector('.buy form');
-  var orderFormInputElements = orderFormElement.querySelectorAll('input');
 
   var paymentFormElement = orderFormElement.querySelector('.payment');
   var paymentMethodElement = paymentFormElement.querySelector('.payment__method');
@@ -130,12 +129,4 @@
       window.catalog.checkBasketArray();
     }
   });
-
-  window.order = {
-    disableInputs: function (flag) {
-      orderFormInputElements.forEach(function (element) {
-        element.disabled = flag;
-      });
-    }
-  };
 })();

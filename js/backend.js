@@ -7,7 +7,6 @@
   var STATUS_NOT_FOUND = 404;
   var STATUS_SERVER_ERROR = 500;
   var TIMEOUT_TIME = 10000;
-  var ESC_KEYCODE = 27;
 
   var setupRequest = function (xhr, successCallback, errorCallback) {
     xhr.responseType = 'json';
@@ -61,41 +60,12 @@
 
     showErrorPopup: function () {
       var errorPopupElement = document.querySelector('#modal-error');
-      var btnClose = errorPopupElement.querySelector('.modal__close');
-
-      var onPopupEscPress = function (evt) {
-        if (evt.keyCode === ESC_KEYCODE) {
-          errorPopupElement.classList.add('modal--hidden');
-        }
-      };
-
-      var onClickCloseButton = function () {
-        errorPopupElement.classList.add('modal--hidden');
-        document.removeEventListener('keydown', onPopupEscPress);
-      };
-
-      errorPopupElement.classList.remove('modal--hidden');
-      btnClose.addEventListener('click', onClickCloseButton);
-      document.addEventListener('keydown', onPopupEscPress);
+      window.utils.showPopup(errorPopupElement);
     },
 
     showSuccessPopup: function () {
       var succesPopupElement = document.querySelector('#modal-success');
-      var btnClose = succesPopupElement.querySelector('.modal__close');
-
-      var onPopupEscPress = function (evt) {
-        if (evt.keyCode === ESC_KEYCODE) {
-          succesPopupElement.classList.add('modal--hidden');
-        }
-      };
-
-      var onClickCloseButton = function () {
-        succesPopupElement.classList.add('modal--hidden');
-      };
-
-      succesPopupElement.classList.remove('modal--hidden');
-      btnClose.addEventListener('click', onClickCloseButton);
-      document.addEventListener('keydown', onPopupEscPress);
+      window.utils.showPopup(succesPopupElement);
     }
   };
 })();
