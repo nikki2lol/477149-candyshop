@@ -1,10 +1,10 @@
 'use strict';
 // модуль, содержащий логику формы оформления заказа
 (function () {
-  var ESC_KEYCODE = 27;
   var MIN_NUMBER_VALUE_KEYCODE = 48;
   var MAX_NUMBER_VALUE_KEYCODE = 57;
   var orderFormElement = document.querySelector('.buy form');
+  var orderFormInputElements = orderFormElement.querySelectorAll('input');
 
   var paymentFormElement = orderFormElement.querySelector('.payment');
   var paymentMethodElement = paymentFormElement.querySelector('.payment__method');
@@ -96,60 +96,46 @@
   cardCvcElement.addEventListener('keypress', checkIsNumber);
 
   cardInputElement.addEventListener('invalid', function () {
-    var errorText = '';
-    if (cardInputElement.validity.patternMismatch || cardInputElement.validity.tooShort || cardInputElement.validity.tooLong) {
-      errorText = 'Номер карты должен состоять только из 16 цифр';
-    } else if (cardInputElement.validity.valueMissing) {
-      errorText = 'Обязательное для заполнения поле';
-    }
+    var errorText = cardInputElement.validity.patternMismatch || cardInputElement.validity.tooShort || cardInputElement.validity.tooLong ? 'Номер карты должен состоять только из 16 цифр' : 'Обязательное для заполнения поле';
     cardInputElement.setCustomValidity(errorText);
   });
 
   cardDateElement.addEventListener('invalid', function () {
-    var errorText = '';
-    if (cardDateElement.validity.tooShort || cardDateElement.validity.tooLong || cardDateElement.validity.patternMismatch) {
-      errorText = 'Срок действия карты должен быть указан в формате ММ/ГГ';
-    } else if (cardDateElement.validity.valueMissing) {
-      errorText = 'Обязательное для заполнения поле';
-    }
+    var errorText = cardDateElement.validity.tooShort || cardDateElement.validity.tooLong || cardDateElement.validity.patternMismatch ? 'Срок действия карты должен быть указан в формате ММ/ГГ' : 'Обязательное для заполнения поле';
     cardDateElement.setCustomValidity(errorText);
   });
 
   cardCvcElement.addEventListener('invalid', function () {
-    var errorText = '';
-    if (cardCvcElement.validity.tooShort || cardCvcElement.validity.tooLong || cardCvcElement.validity.patternMismatch) {
-      errorText = 'Поле должно содержать 3 цифры';
-    } else if (cardCvcElement.validity.valueMissing) {
-      errorText = 'Обязательное для заполнения поле';
-    }
+    var errorText = cardCvcElement.validity.tooShort || cardCvcElement.validity.tooLong || cardCvcElement.validity.patternMismatch ? 'Поле должно содержать 3 цифры' : 'Обязательное для заполнения поле';
     cardCvcElement.setCustomValidity(errorText);
   });
 
   cardHolderElement.addEventListener('invalid', function () {
-    var errorText = '';
-    if (cardHolderElement.validity.patternMismatch) {
-      errorText = 'Поле должно содержать только латинские буквы A-Z';
-    } else if (cardHolderElement.validity.valueMissing) {
-      errorText = 'Обязательное для заполнения поле';
-    }
+    var errorText = cardHolderElement.validity.patternMismatch ? 'Поле должно содержать только латинские буквы A-Z' : 'Обязательное для заполнения поле';
     cardHolderElement.setCustomValidity(errorText);
   });
 
   orderFormElement.addEventListener('submit', function (evt) {
     evt.preventDefault();
     if (orderFormElement.checkValidity()) {
-      window.upload(new FormData(orderFormElement), window.showSuccessPopup, window.showErrorPopup);
+      window.backend.upload(new FormData(orderFormElement), window.backend.showSuccessPopup, window.backend.showErrorPopup);
       orderFormElement.reset();
       paymentCardStatusElement.textContent = 'Не определен';
       paymentCardElement.checked = true;
       togglePayment();
       deliveryStoreBtnElement.checked = true;
       toggleDelivery();
-      window.basketObjArray = [];
-      window.clearBasketGoods();
-      window.checkBasketArray();
+      window.data.basketObjArray = [];
+      window.catalog.clearBasketGoods();
+      window.catalog.checkBasketArray();
     }
   });
 
-  window.ESC_KEYCODE = ESC_KEYCODE;
+  window.order = {
+    disableInputs: function (flag) {
+      orderFormInputElements.forEach(function (element) {
+        element.disabled = flag;
+      });
+    }
+  };
 })();

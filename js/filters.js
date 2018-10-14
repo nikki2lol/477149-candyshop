@@ -50,19 +50,19 @@
 
   // функция для обновления фильтров
   var resetFilters = function () {
-    window.currentFilters.foodType = [];
-    window.currentFilters.foodProperty = [];
+    window.filters.currentFilters.foodType = [];
+    window.filters.currentFilters.foodProperty = [];
     var inputFoodTypeElements = filtersWrapperElement.querySelectorAll('input[name="food-type"]:checked');
     var inputFoodPropertyFilters = filtersWrapperElement.querySelectorAll('input[name="food-property"]:checked');
     inputFoodTypeElements.forEach(function (elem) {
-      window.currentFilters.foodType.push(elem.value);
+      window.filters.currentFilters.foodType.push(elem.value);
     });
     inputFoodPropertyFilters.forEach(function (elem) {
-      window.currentFilters.foodProperty.push(NutritionTypes[elem.value]);
+      window.filters.currentFilters.foodProperty.push(NutritionTypes[elem.value]);
     });
-    window.currentFilters.isFavorite = filtersWrapperElement.querySelector('#filter-favorite').checked;
-    window.currentFilters.amount = filtersWrapperElement.querySelector('#filter-availability').checked;
-    window.currentFilters.currentSort = filtersWrapperElement.querySelector('input[name="sort"]:checked').value;
+    window.filters.currentFilters.isFavorite = filtersWrapperElement.querySelector('#filter-favorite').checked;
+    window.filters.currentFilters.amount = filtersWrapperElement.querySelector('#filter-availability').checked;
+    window.filters.currentFilters.currentSort = filtersWrapperElement.querySelector('input[name="sort"]:checked').value;
   };
 
   // функция сравнения популярности
@@ -88,7 +88,7 @@
   // функция для отлавливания типа сортировки
   var selectCurrentSort = function (a, b) {
     var sortType;
-    switch (window.currentFilters.currentSort) {
+    switch (window.filters.currentFilters.currentSort) {
       case 'popular':
         sortType = sortByPopularity(a, b);
         break;
@@ -108,13 +108,13 @@
   // вынесу проверку type & property в отдельные функции, чтобы возвращать сразу true либо false
   var checkType = function (elem) {
     var index = KindTypes[elem.kind];
-    return window.currentFilters.foodType.indexOf(index) > -1;
+    return window.filters.currentFilters.foodType.indexOf(index) > -1;
   };
 
   var checkProperty = function (elem) {
-    for (var i = 0; i < window.currentFilters.foodProperty.length; i++) {
-      if (elem.nutritionFacts[window.currentFilters.foodProperty[i]]) {
-        return elem.nutritionFacts[window.currentFilters.foodProperty[i]];
+    for (var i = 0; i < window.filters.currentFilters.foodProperty.length; i++) {
+      if (elem.nutritionFacts[window.filters.currentFilters.foodProperty[i]]) {
+        return elem.nutritionFacts[window.filters.currentFilters.foodProperty[i]];
       }
     }
     return false;
@@ -126,18 +126,18 @@
     var foodPropertyMatch = false;
     var priceMatch = false;
 
-    foodTypeMatch = window.currentFilters.foodType.length > 0 ? checkType(elem) : true;
-    foodPropertyMatch = window.currentFilters.foodProperty.length > 0 ? checkProperty(elem) : true;
+    foodTypeMatch = window.filters.currentFilters.foodType.length > 0 ? checkType(elem) : true;
+    foodPropertyMatch = window.filters.currentFilters.foodProperty.length > 0 ? checkProperty(elem) : true;
 
-    if (elem.price >= window.currentFilters.minPrice && elem.price <= window.currentFilters.maxPrice) {
+    if (elem.price >= window.filters.currentFilters.minPrice && elem.price <= window.filters.currentFilters.maxPrice) {
       priceMatch = true;
     }
 
-    if (window.currentFilters.isFavorite) {
+    if (window.filters.currentFilters.isFavorite) {
       return elem.isFavorite;
     }
 
-    if (window.currentFilters.amount) {
+    if (window.filters.currentFilters.amount) {
       return elem.amount > 0;
     }
 
@@ -181,109 +181,109 @@
       });
     }
 
-    window.debounce(window.sortAndFilterCatalog());
+    window.debounce.debounce(window.filters.sortAndFilterCatalog());
   };
 
   var makeNewCatalog = function (array) {
     deleteCardsFromCatalog();
-    catalogCardsElement.appendChild(window.renderCatalog(array));
+    catalogCardsElement.appendChild(window.catalog.renderCatalog(array));
   };
 
-  window.displayCounters = function () {
-    window.catalogObjArray.forEach(function (element) {
-      if (element.kind === 'Мороженое') {
-        countsObject.iceCream += 1;
+  window.filters = {
+    displayCounters: function () {
+      window.data.catalogObjArray.forEach(function (element) {
+        if (element.kind === 'Мороженое') {
+          countsObject.iceCream += 1;
+        }
+
+        if (element.kind === 'Газировка') {
+          countsObject.soda += 1;
+        }
+
+        if (element.kind === 'Жевательная резинка') {
+          countsObject.gum += 1;
+        }
+
+        if (element.kind === 'Мармелад') {
+          countsObject.marmalade += 1;
+        }
+
+        if (element.kind === 'Зефир') {
+          countsObject.marshmallows += 1;
+        }
+
+        if (element.nutritionFacts.sugar) {
+          countsObject.sugarFree += 1;
+        }
+
+        if (element.nutritionFacts.vegetarian) {
+          countsObject.vegetarian += 1;
+        }
+
+        if (element.nutritionFacts.gluten) {
+          countsObject.gluten += 1;
+        }
+
+        if (element.isFavorite) {
+          countsObject.isFavorite += 1;
+        }
+
+        if (element.amount > 0) {
+          countsObject.isAvailable += 1;
+        }
+
+      });
+
+      countElements[0].textContent = '(' + countsObject.iceCream + ')';
+      countElements[1].textContent = '(' + countsObject.soda + ')';
+      countElements[2].textContent = '(' + countsObject.gum + ')';
+      countElements[3].textContent = '(' + countsObject.marmalade + ')';
+      countElements[4].textContent = '(' + countsObject.marshmallows + ')';
+      countElements[5].textContent = '(' + countsObject.sugarFree + ')';
+      countElements[6].textContent = '(' + countsObject.vegetarian + ')';
+      countElements[7].textContent = '(' + countsObject.gluten + ')';
+      countElements[8].textContent = '(' + countsObject.isFavorite + ')';
+      countElements[9].textContent = '(' + countsObject.isAvailable + ')';
+
+      // потому что все подходят изначально под ценовой диапозон и это значение не должно меняться, воообще непонятная логика зачем этот счетчик для цены
+      document.querySelector('.range__count').textContent = '(' + window.data.catalogObjArray.length + ')';
+    },
+
+    sortAndFilterCatalog: function () {
+      var filteredCards = applyFilters(window.data.catalogObjArray);
+      makeNewCatalog(filteredCards);
+      if (filteredCards.length === 0) {
+        showNoResultBlock();
       }
+    },
 
-      if (element.kind === 'Газировка') {
-        countsObject.soda += 1;
-      }
+    setMinMaxPrices: function () {
+      var sortedGoods = window.data.catalogObjArray.sort(function (a, b) {
+        return a.price - b.price;
+      });
 
-      if (element.kind === 'Жевательная резинка') {
-        countsObject.gum += 1;
-      }
+      window.filters.currentFilters.minPrice = sortedGoods[0].price;
+      window.filters.currentFilters.maxPrice = sortedGoods[sortedGoods.length - 1].price;
+    },
 
-      if (element.kind === 'Мармелад') {
-        countsObject.marmalade += 1;
-      }
-
-      if (element.kind === 'Зефир') {
-        countsObject.marshmallows += 1;
-      }
-
-      if (element.nutritionFacts.sugar) {
-        countsObject.sugarFree += 1;
-      }
-
-      if (element.nutritionFacts.vegetarian) {
-        countsObject.vegetarian += 1;
-      }
-
-      if (element.nutritionFacts.gluten) {
-        countsObject.gluten += 1;
-      }
-
-      if (element.isFavorite) {
-        countsObject.isFavorite += 1;
-      }
-
-      if (element.amount > 0) {
-        countsObject.isAvailable += 1;
-      }
-
-    });
-
-    countElements[0].textContent = '(' + countsObject.iceCream + ')';
-    countElements[1].textContent = '(' + countsObject.soda + ')';
-    countElements[2].textContent = '(' + countsObject.gum + ')';
-    countElements[3].textContent = '(' + countsObject.marmalade + ')';
-    countElements[4].textContent = '(' + countsObject.marshmallows + ')';
-    countElements[5].textContent = '(' + countsObject.sugarFree + ')';
-    countElements[6].textContent = '(' + countsObject.vegetarian + ')';
-    countElements[7].textContent = '(' + countsObject.gluten + ')';
-    countElements[8].textContent = '(' + countsObject.isFavorite + ')';
-    countElements[9].textContent = '(' + countsObject.isAvailable + ')';
-
-    // потому что все подходят изначально под ценовой диапозон и это значение не должно меняться, воообще непонятная логика зачем этот счетчик для цены
-
-    document.querySelector('.range__count').textContent = '(' + window.catalogObjArray.length + ')';
-  };
-
-  window.sortAndFilterCatalog = function () {
-    window.filteredCards = applyFilters(window.catalogObjArray);
-    makeNewCatalog(window.filteredCards);
-
-    if (window.filteredCards.length === 0) {
-      showNoResultBlock();
+    // объект для хранения данных о текущих примененных фильтрах
+    currentFilters: {
+      foodType: null,
+      foodProperty: null,
+      minPrice: 0,
+      maxPrice: 90,
+      isFavorite: false,
+      amount: false,
+      currentSort: null
     }
-  };
-
-  window.setMinMaxPrices = function () {
-    var sortedGoods = window.catalogObjArray.sort(function (a, b) {
-      return a.price - b.price;
-    });
-
-    window.currentFilters.minPrice = sortedGoods[0].price;
-    window.currentFilters.maxPrice = sortedGoods[sortedGoods.length - 1].price;
-  };
-
-  // объект для хранения данных о текущих примененных фильтрах
-  window.currentFilters = {
-    foodType: null,
-    foodProperty: null,
-    minPrice: 0,
-    maxPrice: 90,
-    isFavorite: false,
-    amount: false,
-    currentSort: null
   };
 
   resetFiltersElement.addEventListener('click', function (evt) {
     evt.preventDefault();
     filtersFormElement.reset();
-    window.setMinMaxPrices();
-    window.resetRangeFiltersValue();
-    window.sortAndFilterCatalog();
+    window.filters.setMinMaxPrices();
+    window.slider.resetRangeFiltersValue();
+    window.filters.sortAndFilterCatalog();
   });
 
   filtersFormElement.addEventListener('change', onFormChange);

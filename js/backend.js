@@ -7,6 +7,7 @@
   var STATUS_NOT_FOUND = 404;
   var STATUS_SERVER_ERROR = 500;
   var TIMEOUT_TIME = 10000;
+  var ESC_KEYCODE = 27;
 
   var setupRequest = function (xhr, successCallback, errorCallback) {
     xhr.responseType = 'json';
@@ -43,41 +44,58 @@
     xhr.timeout = TIMEOUT_TIME;
   };
 
-  window.load = function (onSuccess, onError) {
-    var xhr = new XMLHttpRequest();
-    setupRequest(xhr, onSuccess, onError);
-    xhr.open('GET', GET_URL);
-    xhr.send();
-  };
+  window.backend = {
+    load: function (onSuccess, onError) {
+      var xhr = new XMLHttpRequest();
+      setupRequest(xhr, onSuccess, onError);
+      xhr.open('GET', GET_URL);
+      xhr.send();
+    },
 
-  window.upload = function (data, onSuccess, onError) {
-    var xhr = new XMLHttpRequest();
-    setupRequest(xhr, onSuccess, onError);
-    xhr.open('POST', SUBMIT_URL);
-    xhr.send(data);
-  };
+    upload: function (data, onSuccess, onError) {
+      var xhr = new XMLHttpRequest();
+      setupRequest(xhr, onSuccess, onError);
+      xhr.open('POST', SUBMIT_URL);
+      xhr.send(data);
+    },
 
-  window.showErrorPopup = function () {
-    var succesPopupElement = document.querySelector('#modal-error');
-    var btnClose = succesPopupElement.querySelector('.modal__close');
+    showErrorPopup: function () {
+      var errorPopupElement = document.querySelector('#modal-error');
+      var btnClose = errorPopupElement.querySelector('.modal__close');
 
-    var onClickCloseButton = function () {
-      succesPopupElement.classList.add('modal--hidden');
-    };
+      var onPopupEscPress = function (evt) {
+        if (evt.keyCode === ESC_KEYCODE) {
+          errorPopupElement.classList.add('modal--hidden');
+        }
+      };
 
-    succesPopupElement.classList.remove('modal--hidden');
-    btnClose.addEventListener('click', onClickCloseButton);
-  };
+      var onClickCloseButton = function () {
+        errorPopupElement.classList.add('modal--hidden');
+        document.removeEventListener('keydown', onPopupEscPress);
+      };
 
-  window.showSuccessPopup = function () {
-    var succesPopupElement = document.querySelector('#modal-success');
-    var btnClose = succesPopupElement.querySelector('.modal__close');
+      errorPopupElement.classList.remove('modal--hidden');
+      btnClose.addEventListener('click', onClickCloseButton);
+      document.addEventListener('keydown', onPopupEscPress);
+    },
 
-    var onClickCloseButton = function () {
-      succesPopupElement.classList.add('modal--hidden');
-    };
+    showSuccessPopup: function () {
+      var succesPopupElement = document.querySelector('#modal-success');
+      var btnClose = succesPopupElement.querySelector('.modal__close');
 
-    succesPopupElement.classList.remove('modal--hidden');
-    btnClose.addEventListener('click', onClickCloseButton);
+      var onPopupEscPress = function (evt) {
+        if (evt.keyCode === ESC_KEYCODE) {
+          succesPopupElement.classList.add('modal--hidden');
+        }
+      };
+
+      var onClickCloseButton = function () {
+        succesPopupElement.classList.add('modal--hidden');
+      };
+
+      succesPopupElement.classList.remove('modal--hidden');
+      btnClose.addEventListener('click', onClickCloseButton);
+      document.addEventListener('keydown', onPopupEscPress);
+    }
   };
 })();

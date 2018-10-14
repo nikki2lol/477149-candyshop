@@ -2,8 +2,6 @@
 // модуль, который создаёт данные
 (function () {
   var catalogCardsElement = document.querySelector('.catalog__cards');
-  window.catalogObjArray = [];
-  window.basketObjArray = [];
 
   // функция для первичной загрузки данных и рендера каталога
   var onSuccessLoadData = function (data) {
@@ -17,19 +15,26 @@
       return b.rating.number - a.rating.number;
     });
 
-    window.catalogObjArray = data.slice();
-    window.resetRangeFiltersValue();
+    window.data.catalogObjArray = data.slice();
+    window.slider.resetRangeFiltersValue();
 
-    var catalogFragment = window.renderCatalog(data);
+    var catalogFragment = window.catalog.renderCatalog(data);
     catalogCardsElement.append(catalogFragment);
 
-    window.setMinMaxPrices();
+    window.filters.setMinMaxPrices();
+
+    window.order.disableInputs(true);
 
     catalogCardsElement.classList.remove('catalog__cards--load');
     catalogCardsElement.querySelector('.catalog__load').classList.add('visually-hidden');
 
-    window.displayCounters();
+    window.filters.displayCounters();
   };
 
-  window.load(onSuccessLoadData, window.showErrorPopup);
+  window.data = {
+    catalogObjArray: [],
+    basketObjArray: []
+  };
+
+  window.backend.load(onSuccessLoadData, window.backend.showErrorPopup);
 })();
